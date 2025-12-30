@@ -116,14 +116,39 @@ function handleFormSubmit(form) {
         return;
     }
 
-    // Simulate form submission (in a real app, this would send to a server)
+    // Disable form inputs
     disableFormInputs(form, true);
     
-    setTimeout(() => {
-        showFormMessage('Message sent successfully! I\'ll get back to you soon.', 'success');
-        form.reset();
+    // Submit to Formspree as JSON
+    fetch(form.action, {
+        method: 'POST',
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            subject: subject,
+            message: message
+        }),
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            showFormMessage('Message sent successfully! I\'ll get back to you soon.', 'success');
+            form.reset();
+            disableFormInputs(form, false);
+        } else {
+            return response.json().then(data => {
+                throw new Error(data.errors ? Object.values(data.errors)[0] : 'Error sending message');
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showFormMessage('There was an error sending your message. Please try again.', 'error');
         disableFormInputs(form, false);
-    }, 1500);
+    });
 }
 
 function showFormMessage(message, type) {
