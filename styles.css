@@ -131,6 +131,31 @@ h3 {
     animation: none;
 }
 
+/* Ambient gradient + particles overlay */
+.ambient-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0; /* painted after .abstract-bg, behind content */
+    background:
+        radial-gradient(900px 900px at 25% 30%, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0.06) 40%, rgba(14, 165, 233, 0.02) 60%, transparent 70%),
+        radial-gradient(800px 800px at 75% 70%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(255, 255, 255, 0.01) 60%, transparent 70%);
+    background-repeat: no-repeat;
+    animation: gradientDrift 28s ease-in-out infinite alternate;
+}
+
+@keyframes gradientDrift {
+    0% {
+        background-position: 20% 30%, 80% 70%;
+    }
+    50% {
+        background-position: 60% 40%, 40% 60%;
+    }
+    100% {
+        background-position: 30% 70%, 70% 30%;
+    }
+}
+
 /* Light follow cursor effect */
 .light-follow {
     position: fixed;
@@ -372,13 +397,15 @@ section {
    ============================================ */
 .hero {
     margin-top: 80px;
-    padding: 100px 0;
+    padding: 40px 0;
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2rem;
     animation: fadeInUp 0.8s ease-out;
     flex-wrap: wrap;
+    position: relative;
 }
 
 @keyframes fadeInUp {
@@ -454,6 +481,51 @@ section {
     justify-content: center;
     align-items: center;
     animation: slideInRight 0.8s ease-out;
+}
+
+/* Scroll cue for hero */
+.scroll-cue {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    opacity: 0.75;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    animation: cuePulse 2.8s ease-in-out infinite;
+    text-decoration: none;
+}
+
+.scroll-cue:hover {
+    opacity: 1;
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+.scroll-cue span {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1;
+    animation: cueBounce 2.8s ease-in-out infinite;
+}
+
+@keyframes cuePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.0); }
+    50% { box-shadow: 0 0 12px 0 rgba(14, 165, 233, 0.15); }
+}
+
+@keyframes cueBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
 }
 
 .code-block {
@@ -754,6 +826,97 @@ section {
     line-height: 1.5;
 }
 
+/* ============================================
+   TILTED STACKS (Skills & Process)
+   ============================================ */
+.tilted-stack {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 90px; /* space for overlapping */
+    perspective: 1000px;
+}
+
+.tilted-stack .stack-card {
+    background: var(--primary-card);
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    border-radius: 12px;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    will-change: transform;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    cursor: none;
+}
+
+/* Layering offsets for the deck */
+.tilted-stack .stack-card:nth-child(1) {
+    transform: rotate(-3deg) translateX(0);
+    z-index: 4;
+}
+.tilted-stack .stack-card:nth-child(2) {
+    transform: rotate(-2deg) translateX(-6px) translateY(-28px);
+    z-index: 3;
+}
+.tilted-stack .stack-card:nth-child(3) {
+    transform: rotate(-1deg) translateX(-12px) translateY(-56px);
+    z-index: 2;
+}
+.tilted-stack .stack-card:nth-child(4) {
+    transform: rotate(0deg) translateX(-18px) translateY(-84px);
+    z-index: 1;
+}
+
+.tilted-stack .stack-card:hover,
+.tilted-stack .stack-card.stack-hover {
+    transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateX(0) translateY(-6px);
+    box-shadow: 0 16px 40px rgba(14, 165, 233, 0.18);
+    border-color: var(--accent-blue);
+}
+
+/* Content styles inside stack cards */
+.stack-card .skill-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+}
+.stack-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+}
+.stack-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+.stack-card .step-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+/* ============================================
+   RESPONSIVE - Tilted Stacks
+   ============================================ */
+@media (max-width: 768px) {
+    .tilted-stack {
+        padding-top: 0;
+    }
+    .tilted-stack .stack-card,
+    .tilted-stack .stack-card:nth-child(1),
+    .tilted-stack .stack-card:nth-child(2),
+    .tilted-stack .stack-card:nth-child(3),
+    .tilted-stack .stack-card:nth-child(4) {
+        transform: none !important;
+        z-index: auto;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        margin-top: 1.25rem;
+    }
+}
+
 /* Individual skill animations */
 .skill-item:nth-child(1):hover .skill-icon {
     /* Laptop - open animation */
@@ -860,7 +1023,7 @@ section {
 
 .projects-grid {
     position: relative;
-    height: 2600px;
+    height: 2300px;
     overflow: hidden;
 }
 
@@ -900,7 +1063,8 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
-    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.8s ease-in-out;
+    will-change: transform, top, left;
     display: flex;
     flex-direction: column;
 }
@@ -1300,6 +1464,57 @@ section {
     gap: 2rem;
 }
 
+.testimonials-carousel {
+    position: relative;
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.testimonials-track {
+    display: flex;
+    gap: 0;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.testimonial-card {
+    min-width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.testimonial-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.testimonial-arrow {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-light);
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.testimonial-arrow:hover {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2);
+}
+
 .testimonial {
     background: var(--primary-card);
     border: 1px solid var(--border-color);
@@ -1308,6 +1523,11 @@ section {
     border-left: 3px solid var(--accent-blue);
     transition: all 0.4s ease;
     animation: fadeInUp 0.6s ease-out both;
+    max-width: 560px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .testimonial:nth-child(1) { animation-delay: 0.1s; }
@@ -1321,22 +1541,24 @@ section {
 }
 
 .testimonial .stars {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
+    display: block;
+    font-size: 1.05rem;
+    margin-bottom: 0.9rem;
     letter-spacing: 2px;
 }
 
 .testimonial p {
+    display: block;
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.9rem;
     font-style: italic;
-    line-height: 1.7;
+    line-height: 1.6;
     font-size: 0.95rem;
 }
 
 .testimonial-author {
-    display: flex;
-    flex-direction: column;
+    display: block;
+    margin-top: 0.75rem;
 }
 
 .testimonial-author strong {
@@ -1656,6 +1878,55 @@ section {
     margin: 0 auto;
 }
 
+/* FAQ controls */
+.faq-controls {
+    max-width: 1000px;
+    margin: 0 auto 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+.faq-pagination {
+    max-width: 1000px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.faq-page-indicator {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.faq-pagination .btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.faq-search {
+    width: 100%;
+    background: var(--primary-light);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.faq-search::placeholder { color: var(--text-muted); }
+.faq-search:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.faq-actions { display: flex; gap: 0.75rem; }
+.faq-actions .btn { padding: 0.6rem 1rem; }
+
 .faq-item {
     background: var(--primary-card);
     border: 1px solid var(--border-color);
@@ -1663,6 +1934,7 @@ section {
     overflow: hidden;
     animation: fadeInUp 0.6s ease-out both;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
 }
 
 .faq-item:nth-child(1) { animation-delay: 0.1s; }
@@ -1677,6 +1949,20 @@ section {
     box-shadow: 0 12px 24px rgba(14, 165, 233, 0.12);
     transform: translateY(-4px);
 }
+
+/* Animated accent bar */
+.faq-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0px;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(14,165,233,0.25), rgba(14,165,233,0.1));
+    transition: width 0.4s ease;
+}
+.faq-item.active::before { width: 6px; }
+.faq-item:hover::before { width: 3px; }
 
 .faq-item.active {
     border-color: var(--accent-blue);
@@ -1731,6 +2017,15 @@ section {
     color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.6;
+}
+
+/* Search filtering */
+.faq-item.hidden { display: none; }
+.faq-highlight {
+    background: rgba(14, 165, 233, 0.15);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 0 2px;
 }
 
 
@@ -2114,6 +2409,39 @@ section {
         gap: 1.5rem;
     }
 
+    /* Projects mobile fallback: stack cards */
+    .projects-grid {
+        height: auto;
+        overflow: visible;
+    }
+    .project-card {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+    .project-image {
+        height: 160px;
+    }
+    .project-info {
+        padding: 1.2rem;
+    }
+
+    /* About intro: stack and center profile */
+    .about-intro {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    .about-image {
+        flex: 0 1 auto;
+        width: 180px;
+    }
+    .profile-pic {
+        width: 180px;
+        height: 180px;
+    }
+
     .pricing-card.featured {
         transform: scale(1);
     }
@@ -2195,7 +2523,16 @@ section {
     .testimonials-grid,
     .pricing-cards {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.25rem;
+    }
+    /* Slightly smaller project image on very small screens */
+    .project-image {
+        height: 140px;
+    }
+    /* Tighten hero spacing on small screens */
+    .hero {
+        min-height: calc(100vh - 70px);
+        padding: 24px 0;
     }
 
     .pricing-card.featured {

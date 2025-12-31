@@ -54,7 +54,9 @@
         </div>
     </section>
 
-    <section class="featured">
+    <a href="#featured" class="scroll-cue" aria-label="Scroll to Featured"><span>↓</span></a>
+
+    <section class="featured" id="featured">
         <div class="container">
             <h2>Featured Works</h2>
             <div class="carousel-container">
@@ -96,23 +98,23 @@
     <section class="skills">
         <div class="container">
             <h2>Technologies & Skills</h2>
-            <div class="skills-grid">
-                <div class="skill-item">
+            <div class="tilted-stack skills-stack">
+                <div class="stack-card">
                     <div class="skill-icon">💻</div>
                     <h3>UI/UX Design</h3>
                     <p>Beautiful and intuitive user interfaces</p>
                 </div>
-                <div class="skill-item">
+                <div class="stack-card">
                     <div class="skill-icon">⚙️</div>
                     <h3>Performance</h3>
                     <p>Lightning-fast, optimized web experiences</p>
                 </div>
-                <div class="skill-item">
+                <div class="stack-card">
                     <div class="skill-icon">📡</div>
                     <h3>Responsive</h3>
                     <p>Works perfectly on all devices</p>
                 </div>
-                <div class="skill-item">
+                <div class="stack-card">
                     <div class="skill-icon">🛠️</div>
                     <h3>Development</h3>
                     <p>Clean, maintainable, and scalable code</p>
@@ -132,23 +134,23 @@
     <section class="process">
         <div class="container">
             <h2>How I Work</h2>
-            <div class="process-grid">
-                <div class="process-step">
+            <div class="tilted-stack process-stack">
+                <div class="stack-card">
                     <div class="step-number">01</div>
                     <h3>Discovery & Planning</h3>
                     <p>We start by understanding your vision, goals, and target audience. I'll ask the right questions to ensure we're building exactly what you need.</p>
                 </div>
-                <div class="process-step">
+                <div class="stack-card">
                     <div class="step-number">02</div>
                     <h3>Design & Wireframes</h3>
                     <p>I create beautiful, user-friendly designs that align with your brand. You'll see mockups and prototypes before any code is written.</p>
                 </div>
-                <div class="process-step">
+                <div class="stack-card">
                     <div class="step-number">03</div>
                     <h3>Development</h3>
                     <p>Building clean, efficient code with best practices. I ensure your site is fast, responsive, and optimized for all devices and browsers.</p>
                 </div>
-                <div class="process-step">
+                <div class="stack-card">
                     <div class="step-number">04</div>
                     <h3>Testing & Launch</h3>
                     <p>Thorough testing, quality assurance, and final deployment. Your site goes live polished and ready to impress your audience.</p>
@@ -160,6 +162,18 @@
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
+            <div class="faq-controls">
+                <input type="text" id="faqSearch" class="faq-search" placeholder="Search questions..." aria-label="Search FAQs">
+                <div class="faq-actions">
+                    <button class="btn btn-secondary" id="faqExpandAll" type="button">Expand All</button>
+                    <button class="btn btn-secondary" id="faqCollapseAll" type="button">Collapse All</button>
+                </div>
+            </div>
+            <div class="faq-pagination" aria-label="FAQ pagination controls">
+                <button class="btn btn-secondary" id="faqPrevPage" type="button">← Prev</button>
+                <span id="faqPageIndicator" class="faq-page-indicator">Page 1</span>
+                <button class="btn btn-secondary" id="faqNextPage" type="button">Next →</button>
+            </div>
             <div class="faq-grid">
                 <div class="faq-item">
                     <button class="faq-question">
@@ -213,6 +227,61 @@
                     </button>
                     <div class="faq-answer">
                         <p>Pricing is project-based and depends on scope, complexity, and timeline. I provide custom quotes after our initial consultation. Let's discuss your needs!</p>
+                    </div>
+                </div>
+                <!-- Additional FAQs for pagination -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Do you handle hosting and domain setup?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, I can help choose reliable hosting, configure servers, set up domains and SSL certificates, and deploy with CI/CD for seamless updates.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Can you integrate CMS like WordPress or headless?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>I work with traditional CMS and modern headless stacks (e.g., Contentful, Sanity) for flexible content workflows and performance.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>What about SEO and performance?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>I implement on‑page SEO, semantic HTML, structured data, image optimization, caching, and monitoring to keep pages fast and discoverable.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Do you provide analytics and tracking?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, from privacy‑friendly analytics to full GA4 setups, plus event tracking for conversions and A/B testing hooks if needed.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How do you approach accessibility (A11y)?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>I follow WCAG guidelines: proper contrast, keyboard navigation, ARIA landmarks, semantic markup, and audit tools to validate compliance.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Do you support multi‑language sites?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, I can implement internationalization (i18n), language toggles, locale‑aware routing, and content workflows for translations.</p>
                     </div>
                 </div>
             </div>

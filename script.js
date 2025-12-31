@@ -13,7 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTypingAnimation();
     initializeCursorEffects();
     initializeFAQ();
+    initializeFAQControls();
+    initializeFAQPagination();
     initializeCarousels();
+    initializeAmbientBackground();
+    initializeTiltedStacks();
 });
 
 // ============================================
@@ -488,6 +492,10 @@ function initializeTypingAnimation() {
 // ============================================
 
 function initializeCursorEffects() {
+    // Skip on touch devices to avoid overhead and odd UX
+    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) {
+        return;
+    }
     // Create cursor elements
     const cursorDot = document.createElement('div');
     cursorDot.className = 'cursor-dot';
@@ -549,7 +557,7 @@ function initializeCursorEffects() {
     });
 
     // Scale up cursor when hovering over interactive elements
-    const interactiveElements = 'a, button, input, textarea, select, .nav-link, .btn';
+    const interactiveElements = 'a, button, input, textarea, select, .nav-link, .btn, .stack-card';
     document.addEventListener('mouseover', (e) => {
         if (e.target.closest(interactiveElements)) {
             cursorRing.style.transform = 'translate(-50%, -50%) scale(1.5)';
@@ -568,7 +576,7 @@ function initializeCursorEffects() {
 
     // Hide default cursors on all elements to show custom cursor everywhere
     document.addEventListener('mouseover', (e) => {
-        if (e.target.closest('a, button, input, textarea, select, .nav-link, .btn')) {
+        if (e.target.closest(interactiveElements)) {
             e.target.style.cursor = 'none';
         }
     });
@@ -601,6 +609,139 @@ function initializeFAQ() {
 }
 
 // ============================================
+// FAQ CONTROLS: Search + Expand/Collapse All
+// ============================================
+
+function initializeFAQControls() {
+    const search = document.getElementById('faqSearch');
+    const expandAllBtn = document.getElementById('faqExpandAll');
+    const collapseAllBtn = document.getElementById('faqCollapseAll');
+    const items = Array.from(document.querySelectorAll('.faq-item'));
+
+    if (!items.length) return;
+
+    // Cache original HTML for highlighting reset
+    items.forEach(item => {
+        const questionSpan = item.querySelector('.faq-question span');
+        const answerP = item.querySelector('.faq-answer p');
+        if (questionSpan && !questionSpan.dataset.orig) questionSpan.dataset.orig = questionSpan.innerHTML;
+        if (answerP && !answerP.dataset.orig) answerP.dataset.orig = answerP.innerHTML;
+    });
+
+    function highlight(text, term) {
+        if (!term) return text;
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'ig');
+        return text.replace(regex, '<mark class="faq-highlight">$1</mark>');
+    }
+
+    function filter(term) {
+        const q = term.trim().toLowerCase();
+        items.forEach(item => {
+            const questionSpan = item.querySelector('.faq-question span');
+            const answerP = item.querySelector('.faq-answer p');
+            const text = `${questionSpan ? questionSpan.textContent : ''} ${answerP ? answerP.textContent : ''}`.toLowerCase();
+            const match = q !== '' && text.includes(q);
+            // Only toggle visibility when searching; leave pagination in control when empty
+            item.classList.toggle('hidden', q !== '' && !match);
+            // Apply/reset highlight
+            if (questionSpan && questionSpan.dataset.orig) {
+                questionSpan.innerHTML = q ? highlight(questionSpan.dataset.orig, q) : questionSpan.dataset.orig;
+            }
+            if (answerP && answerP.dataset.orig) {
+                answerP.innerHTML = q ? highlight(answerP.dataset.orig, q) : answerP.dataset.orig;
+            }
+        });
+        // Notify pagination to update indicator state
+        const indicator = document.getElementById('faqPageIndicator');
+        if (indicator) {
+            if (q) {
+                const visible = items.filter(i => !i.classList.contains('hidden')).length;
+                indicator.textContent = `Search results (${visible})`;
+            }
+        }
+    }
+
+    if (search) {
+        search.addEventListener('input', e => filter(e.target.value));
+    }
+
+    if (expandAllBtn) {
+        expandAllBtn.addEventListener('click', () => {
+            items.forEach(item => item.classList.add('active'));
+        });
+    }
+
+    if (collapseAllBtn) {
+        collapseAllBtn.addEventListener('click', () => {
+            items.forEach(item => item.classList.remove('active'));
+        });
+    }
+}
+
+// ============================================
+// FAQ PAGINATION
+// ============================================
+
+function initializeFAQPagination() {
+    const items = Array.from(document.querySelectorAll('.faq-item'));
+    const prevBtn = document.getElementById('faqPrevPage');
+    const nextBtn = document.getElementById('faqNextPage');
+    const indicator = document.getElementById('faqPageIndicator');
+    const search = document.getElementById('faqSearch');
+
+    if (!items.length || !prevBtn || !nextBtn || !indicator) return;
+
+    let currentPage = 1;
+    const pageSize = window.innerWidth <= 768 ? 4 : 6;
+    const totalPages = Math.ceil(items.length / pageSize);
+
+    function showPage(page) {
+        currentPage = Math.max(1, Math.min(totalPages, page));
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        items.forEach((item, idx) => {
+            // Only control visibility if not in search mode
+            const inSearch = search && search.value.trim() !== '';
+            if (!inSearch) {
+                item.classList.toggle('hidden', !(idx >= start && idx < end));
+            }
+        });
+        updateIndicator();
+        updateButtons();
+    }
+
+    function updateIndicator() {
+        const inSearch = search && search.value.trim() !== '';
+        if (!inSearch) {
+            indicator.textContent = `Page ${currentPage} of ${totalPages}`;
+        } else {
+            const visible = items.filter(i => !i.classList.contains('hidden')).length;
+            indicator.textContent = `Search results (${visible})`;
+        }
+    }
+
+    function updateButtons() {
+        const inSearch = search && search.value.trim() !== '';
+        prevBtn.disabled = inSearch || currentPage === 1;
+        nextBtn.disabled = inSearch || currentPage === totalPages;
+    }
+
+    prevBtn.addEventListener('click', () => showPage(currentPage - 1));
+    nextBtn.addEventListener('click', () => showPage(currentPage + 1));
+    window.addEventListener('resize', () => showPage(currentPage));
+    if (search) search.addEventListener('input', () => {
+        // When searching, indicator/buttons update; when cleared, return to current page
+        updateIndicator();
+        updateButtons();
+        if (search.value.trim() === '') showPage(currentPage);
+    });
+
+    // Initialize
+    showPage(1);
+}
+
+// ============================================
 // CAROUSEL FUNCTIONALITY
 // ============================================
 
@@ -608,7 +749,10 @@ function initializeCarousels() {
     // Featured Works Carousel - 3 second interval
     initializeCarousel('.featured-carousel', '.carousel-prev', '.carousel-next', '.indicator', 2500);    
     // Projects Grid Carousel - 2.5 second interval
-    initializeProjectsCarousel();}
+    initializeProjectsCarousel();
+    // Testimonials carousel on about page
+    initializeTestimonialsCarousel();
+}
 
 function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, indicatorSelector, autoPlayInterval = 5000) {
     const carousel = document.querySelector(carouselSelector);
@@ -692,6 +836,69 @@ function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, 
 }
 
 // ============================================
+// TESTIMONIALS CAROUSEL (ABOUT PAGE)
+// ============================================
+
+function initializeTestimonialsCarousel() {
+    const carousel = document.querySelector('.testimonials-carousel');
+    if (!carousel) return;
+
+    const track = carousel.querySelector('.testimonials-track');
+    const slides = Array.from(carousel.querySelectorAll('.testimonial-card'));
+    const prevBtn = carousel.querySelector('.testimonial-prev');
+    const nextBtn = carousel.querySelector('.testimonial-next');
+
+    if (!track || slides.length === 0 || !prevBtn || !nextBtn) return;
+
+    let currentIndex = 0;
+    let autoTimer = null;
+
+    function slideWidth() {
+        return slides[0].getBoundingClientRect().width;
+    }
+
+    function getGap() {
+        const styles = getComputedStyle(track);
+        return parseFloat(styles.columnGap || styles.gap || '0');
+    }
+
+    function updateTransform() {
+        const cardWidth = slideWidth();
+        const gap = getGap();
+        const offset = (cardWidth + gap) * currentIndex;
+        track.style.transform = `translateX(-${offset}px)`;
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateTransform();
+        resetAutoPlay();
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateTransform();
+        resetAutoPlay();
+    }
+
+    function startAutoPlay() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(nextSlide, 3500);
+    }
+
+    function resetAutoPlay() {
+        startAutoPlay();
+    }
+
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+    window.addEventListener('resize', updateTransform);
+
+    updateTransform();
+    startAutoPlay();
+}
+
+// ============================================
 // PROJECTS CAROUSEL FUNCTIONALITY
 // ============================================
 
@@ -699,50 +906,203 @@ function initializeProjectsCarousel() {
     const projectsGrid = document.querySelector('.projects-grid');
     
     if (!projectsGrid) return;
+    // Disable carousel on small screens; use stacked layout from CSS
+    if (window.innerWidth <= 768) return;
     
-    const cards = projectsGrid.querySelectorAll('.project-card');
+    const cards = Array.from(projectsGrid.querySelectorAll('.project-card'));
     
     if (cards.length !== 8) return;
     
     // Slot positions for 8-card clockwise carousel (2 columns x 4 rows)
     const slots = [
-        { top: '0px', left: '0%', scale: 1, opacity: 1 },        // 0: Top Left
-        { top: '0px', left: '50%', scale: 1, opacity: 1 },       // 1: Top Right
-        { top: '650px', left: '50%', scale: 1, opacity: 1 },     // 2: Upper Mid Right
-        { top: '1300px', left: '50%', scale: 1, opacity: 1 },    // 3: Lower Mid Right
-        { top: '1950px', left: '50%', scale: 1, opacity: 1 },    // 4: Bottom Right
-        { top: '1950px', left: '0%', scale: 1, opacity: 1 },     // 5: Bottom Left
-        { top: '1300px', left: '0%', scale: 1, opacity: 1 },     // 6: Lower Mid Left
-        { top: '650px', left: '0%', scale: 1, opacity: 1 }       // 7: Upper Mid Left
+        { top: '0px', left: '0%' },           // 0: Top Left
+        { top: '0px', left: '50%' },          // 1: Top Right
+        { top: '575px', left: '50%' },        // 2: Upper Mid Right
+        { top: '1150px', left: '50%' },       // 3: Lower Mid Right
+        { top: '1725px', left: '50%' },       // 4: Bottom Right
+        { top: '1725px', left: '0%' },        // 5: Bottom Left
+        { top: '1150px', left: '0%' },        // 6: Lower Mid Left
+        { top: '575px', left: '0%' }          // 7: Upper Mid Left
     ];
     
-    // Initialize card indices
-    const cardIndices = [0, 1, 2, 3, 4, 5, 6, 7];
+    // Track which slot each card currently occupies
+    let cardSlots = [0, 1, 2, 3, 4, 5, 6, 7];
     
-    function updateCardPositions() {
-        cards.forEach((card, cardIndex) => {
-            const slotIndex = cardIndices[cardIndex];
-            const slot = slots[slotIndex];
+    // Initialize positions immediately without transition
+    function initializePositions() {
+        cards.forEach((card, index) => {
+            const slot = slots[cardSlots[index]];
+            card.style.transition = 'none';
             card.style.top = slot.top;
             card.style.left = slot.left;
-            card.style.transform = `scale(${slot.scale})`;
-            card.style.opacity = slot.opacity;
+        });
+        
+        // Force reflow to ensure the browser registers the initial positions
+        void projectsGrid.offsetHeight;
+        
+        // Re-enable transitions after initial positioning
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.style.transition = 'all 0.8s ease-in-out';
+            });
+        }, 50);
+    }
+    
+    // Update card positions to new slots
+    function updatePositions() {
+        cards.forEach((card, index) => {
+            const slot = slots[cardSlots[index]];
+            card.style.top = slot.top;
+            card.style.left = slot.left;
         });
     }
     
+    // Rotate all cards to next slot
     function rotateClockwise() {
-        // Increment each card's index by 1 (mod 8)
-        cardIndices.forEach((_, index) => {
-            cardIndices[index] = (cardIndices[index] + 1) % 8;
-        });
-        updateCardPositions();
+        cardSlots = cardSlots.map(slot => (slot + 1) % 8);
+        updatePositions();
     }
     
-    // Initial positioning
-    updateCardPositions();
-    
-    // Start rotation every 3 seconds (0.8s animation + 2.2s pause = smooth continuous rotation)
+    // Initialize and start rotation
+    initializePositions();
     setInterval(rotateClockwise, 3000);
+}
+
+// ============================================
+// AMBIENT BACKGROUND (Gradient + Particles)
+// ============================================
+
+function initializeAmbientBackground() {
+    // Create overlay container if not present
+    let overlay = document.querySelector('.ambient-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'ambient-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    // Create canvas for particles
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    overlay.appendChild(canvas);
+
+    let width = 0, height = 0, particles = [];
+    const PARTICLE_COUNT = Math.min(24, Math.max(16, Math.floor(window.innerWidth / 80)));
+    const MAX_SPEED = 0.08; // px per frame
+
+    function resize() {
+        width = overlay.clientWidth;
+        height = overlay.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+
+    function createParticles() {
+        particles = new Array(PARTICLE_COUNT).fill(0).map(() => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: 1.5 + Math.random() * 2.5,
+            vx: (Math.random() - 0.5) * MAX_SPEED,
+            vy: (Math.random() - 0.5) * MAX_SPEED,
+            alpha: 0.08 + Math.random() * 0.07
+        }));
+    }
+
+    function step() {
+        // Clear with transparent
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw particles
+        ctx.globalCompositeOperation = 'lighter';
+        for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Gentle wrap around edges
+            if (p.x < -10) p.x = width + 10;
+            if (p.x > width + 10) p.x = -10;
+            if (p.y < -10) p.y = height + 10;
+            if (p.y > height + 10) p.y = -10;
+
+            // Glow circle
+            const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+            grd.addColorStop(0, `rgba(14,165,233,${p.alpha})`);
+            grd.addColorStop(1, 'rgba(14,165,233,0)');
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+        rafId = requestAnimationFrame(step);
+    }
+
+    let rafId = null;
+    function start() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(step);
+    }
+
+    function stop() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+
+    // Initialize
+    resize();
+    createParticles();
+    start();
+
+    // Handle resize and visibility
+    window.addEventListener('resize', () => {
+        resize();
+        createParticles();
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stop(); else start();
+    });
+}
+
+// ============================================
+// TILTED STACKS INTERACTIONS
+// ============================================
+
+function initializeTiltedStacks() {
+    const cards = document.querySelectorAll('.tilted-stack .stack-card');
+    if (!cards.length) return;
+
+    cards.forEach(card => {
+        let rafId = null;
+        let tiltX = 0, tiltY = 0;
+        const maxTilt = 6; // degrees
+
+        function onMouseMove(e) {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            tiltX = -y * maxTilt; // rotateX opposite Y movement
+            tiltY = x * maxTilt;  // rotateY follows X movement
+
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                card.style.transform = `perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(10px)`;
+            });
+        }
+
+        function onMouseEnter() {
+            card.classList.add('stack-hover');
+        }
+
+        function onMouseLeave() {
+            card.classList.remove('stack-hover');
+            card.style.transform = '';
+        }
+
+        card.addEventListener('mousemove', onMouseMove);
+        card.addEventListener('mouseenter', onMouseEnter);
+        card.addEventListener('mouseleave', onMouseLeave);
+    });
 }
 
 // ============================================
