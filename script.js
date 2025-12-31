@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCounterAnimation();
     initializeTypingAnimation();
     initializeCursorEffects();
+    initializeFAQ();
+    initializeCarousels();
 });
 
 // ============================================
@@ -575,8 +577,119 @@ function initializeCursorEffects() {
 }
 
 // ============================================
-// CONSOLE MESSAGE
+// FAQ ACCORDION FUNCTIONALITY
 // ============================================
 
+function initializeFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        
+        question.addEventListener('click', () => {
+            // Close other open items
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item && otherItem.classList.contains('active')) {
+                    otherItem.classList.remove('active');
+                }
+            });
+            
+            // Toggle current item
+            item.classList.toggle('active');
+        });
+    });
+}
+
+// ============================================
+// CAROUSEL FUNCTIONALITY
+// ============================================
+
+function initializeCarousels() {
+    // Featured Works Carousel - 3 second interval
+    initializeCarousel('.featured-carousel', '.carousel-prev', '.carousel-next', '.indicator', 3000);
+}
+
+function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, indicatorSelector, autoPlayInterval = 5000) {
+    const carousel = document.querySelector(carouselSelector);
+    const prevBtn = document.querySelector(prevBtnSelector);
+    const nextBtn = document.querySelector(nextBtnSelector);
+    const indicators = document.querySelectorAll(indicatorSelector);
+
+    if (!carousel || !prevBtn || !nextBtn) return;
+
+    let currentIndex = 0;
+    let autoPlayTimer = null;
+    const totalSlides = indicators.length;
+
+    function updateCarousel() {
+        // Update carousel position - each slide is exactly 100% width
+        carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+        carousel.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+
+        // Update indicators
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === currentIndex);
+        });
+    }
+
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateCarousel();
+        resetAutoPlay();
+    }
+
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateCarousel();
+        resetAutoPlay();
+    }
+
+    function goToSlide(index) {
+        currentIndex = index;
+        updateCarousel();
+        resetAutoPlay();
+    }
+
+    function autoPlay() {
+        autoPlayTimer = setInterval(nextSlide, autoPlayInterval);
+    }
+
+    function resetAutoPlay() {
+        clearInterval(autoPlayTimer);
+        autoPlay();
+    }
+
+    function pauseAutoPlay() {
+        clearInterval(autoPlayTimer);
+    }
+
+    function resumeAutoPlay() {
+        autoPlay();
+    }
+
+    // Event listeners
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => goToSlide(index));
+    });
+
+    // Pause on hover, resume on leave
+    carousel.parentElement.addEventListener('mouseenter', pauseAutoPlay);
+    carousel.parentElement.addEventListener('mouseleave', resumeAutoPlay);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') prevSlide();
+        if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    // Initialize carousel
+    updateCarousel();
+    autoPlay();
+}
+
+// ============================================
 console.log('%c👨‍💻 Welcome to my portfolio!', 'font-size: 20px; color: #16c784; font-weight: bold;');
 console.log('%cLooking to hire? Reach out at: contact@example.com', 'font-size: 14px; color: #667eea;');
