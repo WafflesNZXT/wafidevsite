@@ -606,8 +606,9 @@ function initializeFAQ() {
 
 function initializeCarousels() {
     // Featured Works Carousel - 3 second interval
-    initializeCarousel('.featured-carousel', '.carousel-prev', '.carousel-next', '.indicator', 3000);
-}
+    initializeCarousel('.featured-carousel', '.carousel-prev', '.carousel-next', '.indicator', 2500);    
+    // Projects Grid Carousel - 2.5 second interval
+    initializeProjectsCarousel();}
 
 function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, indicatorSelector, autoPlayInterval = 5000) {
     const carousel = document.querySelector(carouselSelector);
@@ -688,6 +689,60 @@ function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, 
     // Initialize carousel
     updateCarousel();
     autoPlay();
+}
+
+// ============================================
+// PROJECTS CAROUSEL FUNCTIONALITY
+// ============================================
+
+function initializeProjectsCarousel() {
+    const projectsGrid = document.querySelector('.projects-grid');
+    
+    if (!projectsGrid) return;
+    
+    const cards = projectsGrid.querySelectorAll('.project-card');
+    
+    if (cards.length !== 8) return;
+    
+    // Slot positions for 8-card clockwise carousel (2 columns x 4 rows)
+    const slots = [
+        { top: '0px', left: '0%', scale: 1, opacity: 1 },        // 0: Top Left
+        { top: '0px', left: '50%', scale: 1, opacity: 1 },       // 1: Top Right
+        { top: '650px', left: '50%', scale: 1, opacity: 1 },     // 2: Upper Mid Right
+        { top: '1300px', left: '50%', scale: 1, opacity: 1 },    // 3: Lower Mid Right
+        { top: '1950px', left: '50%', scale: 1, opacity: 1 },    // 4: Bottom Right
+        { top: '1950px', left: '0%', scale: 1, opacity: 1 },     // 5: Bottom Left
+        { top: '1300px', left: '0%', scale: 1, opacity: 1 },     // 6: Lower Mid Left
+        { top: '650px', left: '0%', scale: 1, opacity: 1 }       // 7: Upper Mid Left
+    ];
+    
+    // Initialize card indices
+    const cardIndices = [0, 1, 2, 3, 4, 5, 6, 7];
+    
+    function updateCardPositions() {
+        cards.forEach((card, cardIndex) => {
+            const slotIndex = cardIndices[cardIndex];
+            const slot = slots[slotIndex];
+            card.style.top = slot.top;
+            card.style.left = slot.left;
+            card.style.transform = `scale(${slot.scale})`;
+            card.style.opacity = slot.opacity;
+        });
+    }
+    
+    function rotateClockwise() {
+        // Increment each card's index by 1 (mod 8)
+        cardIndices.forEach((_, index) => {
+            cardIndices[index] = (cardIndices[index] + 1) % 8;
+        });
+        updateCardPositions();
+    }
+    
+    // Initial positioning
+    updateCardPositions();
+    
+    // Start rotation every 3 seconds (0.8s animation + 2.2s pause = smooth continuous rotation)
+    setInterval(rotateClockwise, 3000);
 }
 
 // ============================================
