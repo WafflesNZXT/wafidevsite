@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateActiveNavLink();
     initializeCounterAnimation();
     initializeTypingAnimation();
+    initializeCursorEffects();
 });
 
 // ============================================
@@ -478,6 +479,99 @@ function initializeTypingAnimation() {
     }, observerOptions);
 
     testimonialTexts.forEach(text => typingObserver.observe(text));
+}
+
+// ============================================
+// CURSOR EFFECTS - Custom Cursor & Light Follow
+// ============================================
+
+function initializeCursorEffects() {
+    // Create cursor elements
+    const cursorDot = document.createElement('div');
+    cursorDot.className = 'cursor-dot';
+    document.body.appendChild(cursorDot);
+
+    const cursorRing = document.createElement('div');
+    cursorRing.className = 'cursor-ring';
+    document.body.appendChild(cursorRing);
+
+    const lightFollow = document.createElement('div');
+    lightFollow.className = 'light-follow';
+    document.body.appendChild(lightFollow);
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let cursorX = 0;
+    let cursorY = 0;
+    let lightX = 0;
+    let lightY = 0;
+
+    // Track mouse position
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    // Animation loop for smooth cursor follow
+    function animateCursor() {
+        // Smooth follow for cursor dot (fast)
+        cursorX += (mouseX - cursorX) * 0.2;
+        cursorY += (mouseY - cursorY) * 0.2;
+        cursorDot.style.left = cursorX + 'px';
+        cursorDot.style.top = cursorY + 'px';
+
+        // Smooth follow for cursor ring (medium) - same position as dot
+        cursorRing.style.left = cursorX + 'px';
+        cursorRing.style.top = cursorY + 'px';
+
+        // Smooth follow for light (slower)
+        lightX += (mouseX - lightX) * 0.08;
+        lightY += (mouseY - lightY) * 0.08;
+        lightFollow.style.left = lightX + 'px';
+        lightFollow.style.top = lightY + 'px';
+
+        requestAnimationFrame(animateCursor);
+    }
+
+    // Hide cursor and ring on page blur, show on focus
+    document.addEventListener('mouseenter', () => {
+        cursorDot.style.opacity = '1';
+        cursorRing.style.opacity = '1';
+        lightFollow.style.opacity = '0.7';
+    });
+
+    document.addEventListener('mouseleave', () => {
+        cursorDot.style.opacity = '0';
+        cursorRing.style.opacity = '0';
+        lightFollow.style.opacity = '0';
+    });
+
+    // Scale up cursor when hovering over interactive elements
+    const interactiveElements = 'a, button, input, textarea, select, .nav-link, .btn';
+    document.addEventListener('mouseover', (e) => {
+        if (e.target.closest(interactiveElements)) {
+            cursorRing.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            cursorDot.style.background = 'rgba(14, 165, 233, 0.6)';
+            cursorDot.style.boxShadow = '0 0 15px rgba(14, 165, 233, 0.8)';
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        if (e.target.closest(interactiveElements)) {
+            cursorRing.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursorDot.style.background = 'rgba(14, 165, 233, 0.8)';
+            cursorDot.style.boxShadow = '0 0 10px rgba(14, 165, 233, 0.6)';
+        }
+    });
+
+    // Hide default cursors on all elements to show custom cursor everywhere
+    document.addEventListener('mouseover', (e) => {
+        if (e.target.closest('a, button, input, textarea, select, .nav-link, .btn')) {
+            e.target.style.cursor = 'none';
+        }
+    });
+
+    animateCursor();
 }
 
 // ============================================
