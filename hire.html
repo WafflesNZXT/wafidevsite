@@ -76,15 +76,21 @@
             </div>
         </div>
     </section>
+    
 
     <section class="pricing-section">
         <div class="container">
             <h2>Pricing Packages</h2>
             <div class="pricing-cards">
                 <div class="pricing-card">
+                        <div class="tier-icon">🌱</div>
                     <h3>Basic</h3>
                     <div class="price">$399</div>
                     <p class="price-desc">One-time setup • 5–7 Business Days</p>
+                        <div class="value-chips">
+                            <span class="chip">Starter</span>
+                            <span class="chip">Fast setup</span>
+                        </div>
                     <ul class="price-features">
                         <li>✓ Up to 3 Pages</li>
                         <li>✓ Mobile-Responsive Design</li>
@@ -98,9 +104,14 @@
                 </div>
                 <div class="pricing-card featured">
                     <div class="badge">Most Popular</div>
+                        <div class="tier-icon">🚀</div>
                     <h3>Advanced</h3>
                     <div class="price">$599</div>
                     <p class="price-desc">One-time setup • 10–14 Business Days</p>
+                        <div class="value-chips">
+                            <span class="chip">Growing teams</span>
+                            <span class="chip">Popular</span>
+                        </div>
                     <ul class="price-features">
                         <li>✓ Up to 6 Pages</li>
                         <li>✓ Mobile-Responsive Design</li>
@@ -113,9 +124,14 @@
                     </ul>
                 </div>
                 <div class="pricing-card">
+                        <div class="tier-icon">🏆</div>
                     <h3>Pro</h3>
                     <div class="price">$1,199</div>
                     <p class="price-desc">One-time setup • 14–21 Business Days</p>
+                        <div class="value-chips">
+                            <span class="chip">Full stack</span>
+                            <span class="chip">Branding</span>
+                        </div>
                     <ul class="price-features">
                         <li>✓ Up to 10 Pages</li>
                         <li>✓ Blog or Updates Section</li>
@@ -131,7 +147,59 @@
         </div>
     </section>
 
-    <section class="contact-section">
+    <!-- Moved Plan Finder below pricing -->
+    <section class="pricing-section pricing-quiz">
+        <div class="container">
+            <div class="plan-quiz">
+                <div class="quiz-cta">
+                    <p>Not sure which plan fits best?</p>
+                    <button class="btn btn-secondary" id="startPlanQuiz" type="button">Find Your Fit</button>
+                </div>
+                <div class="quiz-panel" id="planQuizPanel" hidden>
+                    <h3>Quick Plan Finder</h3>
+                    <form id="planQuizForm">
+                        <div class="quiz-step" data-step="1">
+                            <h4>How many pages do you expect?</h4>
+                            <label><input type="radio" name="pages" value="1-3" required> 1–3 pages</label>
+                            <label><input type="radio" name="pages" value="4-6"> 4–6 pages</label>
+                            <label><input type="radio" name="pages" value="7-10"> 7–10 pages</label>
+                        </div>
+                        <div class="quiz-step" data-step="2">
+                            <h4>What timeline are you aiming for?</h4>
+                            <label><input type="radio" name="timeline" value="urgent" required> Urgent (within 7 days)</label>
+                            <label><input type="radio" name="timeline" value="standard"> Standard (10–14 days)</label>
+                            <label><input type="radio" name="timeline" value="extended"> Extended (14–21 days)</label>
+                        </div>
+                        <div class="quiz-step" data-step="3">
+                            <h4>Which features matter most?</h4>
+                            <label><input type="checkbox" name="features" value="gallery"> Gallery</label>
+                            <label><input type="checkbox" name="features" value="analytics"> Analytics</label>
+                            <label><input type="checkbox" name="features" value="blog"> Blog/Updates</label>
+                            <label><input type="checkbox" name="features" value="security"> Advanced Security</label>
+                        </div>
+                        <div class="quiz-step" data-step="4">
+                            <h4>Approximate budget?</h4>
+                            <label><input type="radio" name="budget" value="low" required> Under $500</label>
+                            <label><input type="radio" name="budget" value="mid"> $500–$1,000</label>
+                            <label><input type="radio" name="budget" value="high"> $1,000+</label>
+                        </div>
+                        <div class="quiz-actions">
+                            <button class="btn btn-primary" id="quizSubmit" type="submit">Get Recommendation</button>
+                            <button class="btn btn-secondary" id="quizReset" type="button" hidden>Retake Quiz</button>
+                            <button class="btn btn-secondary" id="quizCancel" type="button">Cancel</button>
+                        </div>
+                    </form>
+                    <div class="quiz-result" id="planQuizResult" hidden>
+                        <h4 id="planRecommendationTitle"></h4>
+                        <p id="planRecommendationDesc"></p>
+                        <p class="quiz-note">Ready to start? Proceed via the <a href="#contact" class="faq-note">contact form below</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact">
         <div class="container">
             <h2>Get In Touch</h2>
             <div class="contact-wrapper">
@@ -150,7 +218,7 @@
                     </div>
                     <div class="form-group">
                         <label for="message">Message</label>
-                        <textarea id="message" name="message" placeholder="Tell me about your project..." rows="5" required></textarea>
+                        <textarea id="message" name="message" placeholder="Tell me about your project and which plan you think fits best (e.g., Advanced)." rows="5" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                     <div class="form-message" id="formMessage"></div>
@@ -158,10 +226,6 @@
 
                 <div class="contact-info">
                     <h3>Let's Connect</h3>
-                    <div class="contact-item">
-                        <h4>📧 Email</h4>
-                        <p><a href="mailto:wafi.syed5@gmail.com">wafi.syed5@gmail.com</a></p>
-                    </div>
                     <div class="contact-item">
                         <h4>📞 Phone</h4>
                         <p><a href="tel:+15107318687">+1 (510) 731-8687 (Recommended)</a></p>
@@ -179,7 +243,7 @@
                     </div>
                     <div class="contact-item">
                         <h4>🌍 Based In</h4>
-                        <p>Available for remote work worldwide.</p>
+                        <p>Bay Area, California, but available for remote work, worldwide.</p>
                     </div>
                 </div>
             </div>

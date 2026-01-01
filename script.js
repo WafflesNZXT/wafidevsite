@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCarousels();
     initializeAmbientBackground();
     initializeTiltedStacks();
+    initializePlanQuiz();
 });
 
 // ============================================
@@ -637,14 +638,21 @@ function initializeFAQControls() {
 
     function filter(term) {
         const q = term.trim().toLowerCase();
+        const tokens = q.split(/\s+/).filter(Boolean);
         items.forEach(item => {
             const questionSpan = item.querySelector('.faq-question span');
             const answerP = item.querySelector('.faq-answer p');
             const text = `${questionSpan ? questionSpan.textContent : ''} ${answerP ? answerP.textContent : ''}`.toLowerCase();
-            const match = q !== '' && text.includes(q);
+            const topics = (item.dataset.topics || '').toLowerCase();
+
+            const textMatch = q !== '' && text.includes(q);
+            const topicsMatch = q !== '' && (topics.includes(q) || tokens.some(t => topics.includes(t)));
+            const match = textMatch || topicsMatch;
+
             // Only toggle visibility when searching; leave pagination in control when empty
             item.classList.toggle('hidden', q !== '' && !match);
-            // Apply/reset highlight
+
+            // Apply/reset highlight in visible text
             if (questionSpan && questionSpan.dataset.orig) {
                 questionSpan.innerHTML = q ? highlight(questionSpan.dataset.orig, q) : questionSpan.dataset.orig;
             }
@@ -963,9 +971,28 @@ function initializeProjectsCarousel() {
         updatePositions();
     }
     
+    // Rotation timer controls
+    let rotateTimer = null;
+    function startRotation() {
+        if (rotateTimer) clearInterval(rotateTimer);
+        rotateTimer = setInterval(rotateClockwise, 3000);
+    }
+    function stopRotation() {
+        if (rotateTimer) {
+            clearInterval(rotateTimer);
+            rotateTimer = null;
+        }
+    }
+
+    // Pause rotation when hovering any project card; resume on leave
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', stopRotation);
+        card.addEventListener('mouseleave', startRotation);
+    });
+
     // Initialize and start rotation
     initializePositions();
-    setInterval(rotateClockwise, 3000);
+    startRotation();
 }
 
 // ============================================
@@ -1106,5 +1133,127 @@ function initializeTiltedStacks() {
 }
 
 // ============================================
+// PLAN QUIZ (Pricing page)
+// ============================================
+
+function initializePlanQuiz() {
+    const startBtn = document.getElementById('startPlanQuiz');
+    const panel = document.getElementById('planQuizPanel');
+    const form = document.getElementById('planQuizForm');
+    const steps = form ? Array.from(form.querySelectorAll('.quiz-step')) : [];
+    const submitBtn = document.getElementById('quizSubmit');
+    const resetBtn = document.getElementById('quizReset');
+    const cancelBtn = document.getElementById('quizCancel');
+    const resultBox = document.getElementById('planQuizResult');
+    const resultTitle = document.getElementById('planRecommendationTitle');
+    const resultDesc = document.getElementById('planRecommendationDesc');
+    const applyBtn = document.getElementById('applyRecommendation');
+
+    if (!startBtn || !panel || !form || steps.length === 0) return;
+
+    startBtn.addEventListener('click', () => {
+        panel.hidden = false;
+        // Show all steps at once
+        steps.forEach(step => step.hidden = false);
+        // Ensure buttons are in initial state
+        if (submitBtn) submitBtn.hidden = false;
+        if (resetBtn) resetBtn.hidden = true;
+        resultBox.hidden = true;
+        panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // No step navigation; all steps visible
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pages = form.querySelector('input[name="pages"]:checked')?.value;
+        const timeline = form.querySelector('input[name="timeline"]:checked')?.value;
+        const budget = form.querySelector('input[name="budget"]:checked')?.value;
+        const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(i => i.value);
+
+        const score = { basic: 0, advanced: 0, pro: 0 };
+        // Pages
+        if (pages === '1-3') score.basic += 2; else if (pages === '4-6') score.advanced += 2; else if (pages === '7-10') score.pro += 2;
+        // Timeline
+        if (timeline === 'urgent') { score.basic += 1; score.advanced += 1; }
+        else if (timeline === 'standard') { score.advanced += 2; }
+        else if (timeline === 'extended') { score.pro += 2; }
+        // Features
+        const fCount = features.length;
+        if (fCount <= 1) score.basic += 1; else if (fCount <= 3) score.advanced += 2; else score.pro += 2;
+        // Budget
+        if (budget === 'low') score.basic += 3; else if (budget === 'mid') score.advanced += 3; else if (budget === 'high') score.pro += 3;
+
+        // Pick highest with sensible tie-breaker (Advanced preferred)
+        const entries = Object.entries(score).sort((a, b) => b[1] - a[1]);
+        let recommendation = entries[0][0];
+        if (entries.length > 1 && entries[0][1] === entries[1][1]) {
+            recommendation = 'advanced';
+        }
+
+        // Compose message
+        const labelMap = { basic: 'Basic', advanced: 'Advanced', pro: 'Pro' };
+        resultTitle.textContent = `Recommended: ${labelMap[recommendation]}`;
+        resultDesc.textContent = `Based on your pages, timeline, features, and budget, the ${labelMap[recommendation]} plan should fit well.`;
+        resultBox.hidden = false;
+        if (resetBtn) resetBtn.hidden = false;
+
+        // Hint the recommended plan in the contact message placeholder
+        const messageField = document.getElementById('message');
+        if (messageField) {
+            if (!messageField.dataset.origPlaceholder) {
+                messageField.dataset.origPlaceholder = messageField.placeholder;
+            }
+            messageField.placeholder = `Tell me about your project and which plan you think fits best (Recommended: ${labelMap[recommendation]}).`;
+        }
+
+        // Highlight pricing card
+        const cards = Array.from(document.querySelectorAll('.pricing-card'));
+        cards.forEach(c => c.classList.remove('recommended'));
+        const targetIndex = recommendation === 'basic' ? 0 : recommendation === 'advanced' ? 1 : 2;
+        const targetCard = cards[targetIndex];
+        if (targetCard) {
+            targetCard.classList.add('recommended');
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        form.reset();
+        resultBox.hidden = true;
+        const cards = Array.from(document.querySelectorAll('.pricing-card'));
+        cards.forEach(c => c.classList.remove('recommended'));
+
+        // Restore original contact message placeholder
+        const messageField = document.getElementById('message');
+        if (messageField && messageField.dataset.origPlaceholder) {
+            messageField.placeholder = messageField.dataset.origPlaceholder;
+        }
+    });
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            form.reset();
+            resultBox.hidden = true;
+            panel.hidden = true;
+            const cards = Array.from(document.querySelectorAll('.pricing-card'));
+            cards.forEach(c => c.classList.remove('recommended'));
+
+            // Restore original contact message placeholder
+            const messageField = document.getElementById('message');
+            if (messageField && messageField.dataset.origPlaceholder) {
+                messageField.placeholder = messageField.dataset.origPlaceholder;
+            }
+        });
+    }
+
+    // If the optional apply button exists, wire it up; otherwise skip
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            const contact = document.getElementById('contact');
+            if (contact) contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+}
 console.log('%c👨‍💻 Welcome to my portfolio!', 'font-size: 20px; color: #16c784; font-weight: bold;');
 console.log('%cLooking to hire? Reach out at: contact@example.com', 'font-size: 14px; color: #667eea;');

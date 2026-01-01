@@ -52,9 +52,8 @@
 }</code></pre>
             </div>
         </div>
+        <a href="#featured" class="scroll-cue" aria-label="Scroll to Featured"><span>↓</span></a>
     </section>
-
-    <a href="#featured" class="scroll-cue" aria-label="Scroll to Featured"><span>↓</span></a>
 
     <section class="featured" id="featured">
         <div class="container">
@@ -175,7 +174,7 @@
                 <button class="btn btn-secondary" id="faqNextPage" type="button">Next →</button>
             </div>
             <div class="faq-grid">
-                <div class="faq-item">
+                <div class="faq-item" data-topics="timeline, schedule, delivery time, project timeline">
                     <button class="faq-question">
                         <span>What's your typical project timeline?</span>
                         <span class="faq-icon">+</span>
@@ -184,7 +183,7 @@
                         <p>Timeline depends on project scope, but typically: Small websites (5-7 days), Medium projects (2-3 weeks), Large projects (4-8 weeks). I always provide detailed estimates upfront.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="maintenance, support, updates, upkeep, monitoring">
                     <button class="faq-question">
                         <span>Do you offer ongoing maintenance?</span>
                         <span class="faq-icon">+</span>
@@ -193,7 +192,7 @@
                         <p>Yes! I offer maintenance packages to keep your site secure, updated, and performing optimally. This includes security updates, backups, and performance monitoring.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="existing website, redesign, rebuild, improve, updates">
                     <button class="faq-question">
                         <span>Can you work with my existing website?</span>
                         <span class="faq-icon">+</span>
@@ -202,7 +201,7 @@
                         <p>Absolutely! I can redesign, rebuild, or improve existing websites. Whether you need updates, better performance, or a complete overhaul, I can help.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="responsive, mobile, tablet, devices, responsiveness">
                     <button class="faq-question">
                         <span>What about mobile responsiveness?</span>
                         <span class="faq-icon">+</span>
@@ -211,7 +210,7 @@
                         <p>Mobile responsiveness is built into every project. All sites are optimized for phones, tablets, and desktops to ensure the best user experience on any device.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="revisions, feedback, changes, iterations">
                     <button class="faq-question">
                         <span>How do you handle revisions?</span>
                         <span class="faq-icon">+</span>
@@ -220,7 +219,7 @@
                         <p>Revisions are built into my process. You'll have opportunities to provide feedback at key milestones, and I'll refine the work based on your input.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="pricing, cost, budget, project cost, fees">
                     <button class="faq-question">
                         <span>What's the cost structure?</span>
                         <span class="faq-icon">+</span>
@@ -230,7 +229,7 @@
                     </div>
                 </div>
                 <!-- Additional FAQs for pagination -->
-                <div class="faq-item">
+                <div class="faq-item" data-topics="hosting, domain, ssl, deployment, servers">
                     <button class="faq-question">
                         <span>Do you handle hosting and domain setup?</span>
                         <span class="faq-icon">+</span>
@@ -239,16 +238,16 @@
                         <p>Yes, I can help choose reliable hosting, configure servers, set up domains and SSL certificates, and deploy with CI/CD for seamless updates.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="cms, wordpress, headless, contentful, sanity">
                     <button class="faq-question">
                         <span>Can you integrate CMS like WordPress or headless?</span>
                         <span class="faq-icon">+</span>
                     </button>
                     <div class="faq-answer">
-                        <p>I work with traditional CMS and modern headless stacks (e.g., Contentful, Sanity) for flexible content workflows and performance.</p>
+                        <p>I don’t use WordPress or drag‑and‑drop web builders. I build custom‑coded solutions tailored to your needs. If you require content management, I can implement a lightweight custom CMS or integrate a headless content service (e.g., Contentful, Sanity) via code—keeping performance, security, and maintainability front and center.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="seo, performance, speed, optimization, discoverability">
                     <button class="faq-question">
                         <span>What about SEO and performance?</span>
                         <span class="faq-icon">+</span>
@@ -257,7 +256,7 @@
                         <p>I implement on‑page SEO, semantic HTML, structured data, image optimization, caching, and monitoring to keep pages fast and discoverable.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="analytics, tracking, ga4, conversions, events">
                     <button class="faq-question">
                         <span>Do you provide analytics and tracking?</span>
                         <span class="faq-icon">+</span>
@@ -266,7 +265,7 @@
                         <p>Yes, from privacy‑friendly analytics to full GA4 setups, plus event tracking for conversions and A/B testing hooks if needed.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="accessibility, a11y, wcag, aria, keyboard navigation">
                     <button class="faq-question">
                         <span>How do you approach accessibility (A11y)?</span>
                         <span class="faq-icon">+</span>
@@ -275,7 +274,7 @@
                         <p>I follow WCAG guidelines: proper contrast, keyboard navigation, ARIA landmarks, semantic markup, and audit tools to validate compliance.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item" data-topics="i18n, multilingual, translations, locales, language toggle">
                     <button class="faq-question">
                         <span>Do you support multi‑language sites?</span>
                         <span class="faq-icon">+</span>
@@ -285,6 +284,7 @@
                     </div>
                 </div>
             </div>
+            <p class="faq-note">Don't see your question here? <a href="hire.html#contact">Send us an email</a> and we'll add it!</p>
         </div>
     </section>
 
