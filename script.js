@@ -18,7 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCarousels();
     initializeAmbientBackground();
     initializeTiltedStacks();
-    initializePlanQuiz();
+    initializeMicroInteractions();
+    initializeBuildEstimator();
+    renderProjectDetailPage();
 });
 
 // ============================================
@@ -83,7 +85,8 @@ function updateActiveNavLink() {
         link.classList.remove('active');
         
         const href = link.getAttribute('href');
-        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+        const isProjectsDetail = currentPage === 'project.html' && href === 'projects.html';
+        if (href === currentPage || isProjectsDetail || (currentPage === '' && href === 'index.html')) {
             link.classList.add('active');
         }
     });
@@ -226,9 +229,10 @@ function observeAnimations() {
 
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href === '#') return;
-        
+        const href = this.getAttribute('href') || '';
+        // Only handle in-page anchors at click time; skip external links
+        if (!href.startsWith('#') || href === '#') return;
+
         e.preventDefault();
         const target = document.querySelector(href);
         if (target) {
@@ -267,16 +271,18 @@ window.addEventListener('scroll', () => {
 
 document.querySelectorAll('.btn').forEach(button => {
     button.addEventListener('click', function(e) {
-        // Create ripple effect
+        // Create ripple effect element and auto-remove
         const ripple = document.createElement('span');
+        ripple.className = 'ripple';
         const rect = this.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-
-        ripple.style.width = ripple.style.height = size + 'px';
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        ripple.style.width = ripple.style.height = Math.max(40, size * 0.3) + 'px';
         ripple.style.left = x + 'px';
         ripple.style.top = y + 'px';
+        this.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
     });
 });
 
@@ -311,8 +317,8 @@ function createScrollToTopButton() {
     button.innerHTML = '↑';
     button.style.cssText = `
         position: fixed;
-        bottom: 30px;
-        right: 30px;
+        bottom: calc(24px + env(safe-area-inset-bottom));
+        right: calc(16px + env(safe-area-inset-right));
         width: 50px;
         height: 50px;
         background: linear-gradient(135deg, #16c784 0%, #00f2fe 100%);
@@ -323,7 +329,7 @@ function createScrollToTopButton() {
         display: none;
         font-size: 1.5rem;
         font-weight: bold;
-        z-index: 99;
+        z-index: 1000;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(22, 199, 132, 0.3);
     `;
@@ -339,6 +345,26 @@ function createScrollToTopButton() {
             button.style.display = 'none';
         }
     });
+
+    function adjustForViewport() {
+        const isMobile = window.innerWidth <= 480;
+        if (isMobile) {
+            button.style.width = '44px';
+            button.style.height = '44px';
+            button.style.fontSize = '1.2rem';
+            button.style.bottom = 'calc(16px + env(safe-area-inset-bottom))';
+            button.style.right = 'calc(12px + env(safe-area-inset-right))';
+        } else {
+            button.style.width = '50px';
+            button.style.height = '50px';
+            button.style.fontSize = '1.5rem';
+            button.style.bottom = 'calc(24px + env(safe-area-inset-bottom))';
+            button.style.right = 'calc(16px + env(safe-area-inset-right))';
+        }
+    }
+
+    adjustForViewport();
+    window.addEventListener('resize', adjustForViewport);
 
     button.addEventListener('click', () => {
         window.scrollTo({
@@ -396,6 +422,152 @@ if ('IntersectionObserver' in window) {
     });
 
     document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
+}
+
+// ============================================
+// MICRO INTERACTIONS: Reveal on scroll
+// ============================================
+
+function initializeMicroInteractions() {
+    const revealEls = Array.from(document.querySelectorAll('.reveal'));
+    if (!revealEls.length || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+}
+
+// ============================================
+// BUILD ESTIMATOR
+// ============================================
+
+function initializeBuildEstimator() {
+    const form = document.getElementById('buildEstimatorForm');
+    const pagesInput = document.getElementById('pagesCount');
+    const pagesLabel = document.getElementById('pagesCountLabel');
+    const complexity = document.getElementById('complexity');
+    const featureInputs = Array.from(document.querySelectorAll('input[name="feature"]'));
+    const designInputs = Array.from(document.querySelectorAll('input[name="design"]'));
+    const speedInputs = Array.from(document.querySelectorAll('input[name="speed"]'));
+    const maintenanceInput = document.getElementById('maintenance');
+    const costEl = document.getElementById('estimateCost');
+    const timeEl = document.getElementById('estimateTime');
+    const planEl = document.getElementById('estimatePlan');
+    const breakdownEl = document.getElementById('estimateBreakdown');
+    const resetBtn = document.getElementById('resetEstimator');
+
+    if (!form || !pagesInput || !complexity || !costEl || !timeEl || !planEl) return;
+
+    const basePricing = {
+        basic: { price: 399, days: 6, includedPages: 3, extraPerPage: 60 },
+        advanced: { price: 599, days: 12, includedPages: 6, extraPerPage: 50 },
+        pro: { price: 1199, days: 18, includedPages: 10, extraPerPage: 40 }
+    };
+
+    const featureCosts = {
+        auth: 120,
+        payments: 180,
+        blog: 120,
+        cms: 160,
+        analytics: 60,
+        ecommerce: 220
+    };
+
+    const designMultiplier = { minimal: 1.0, standard: 1.1, polished: 1.25 };
+    const speedMultiplier = { flexible: 0.95, standard: 1.0, rush: 1.2 };
+    const maintenanceMonthly = { basic: 25, advanced: 50, pro: 75 };
+
+    function compute() {
+        const pages = parseInt(pagesInput.value, 10) || 1;
+        pagesLabel.textContent = pages;
+        const tier = complexity.value;
+        const base = basePricing[tier];
+        const selectedFeatures = featureInputs.filter(i => i.checked).map(i => i.value);
+        const design = (designInputs.find(i => i.checked) || { value: 'standard' }).value;
+        const speed = (speedInputs.find(i => i.checked) || { value: 'standard' }).value;
+        const maintenance = !!maintenanceInput?.checked;
+
+        // Base cost
+        let cost = base.price;
+        const extraPages = Math.max(0, pages - base.includedPages);
+        cost += extraPages * base.extraPerPage;
+        let featureCost = 0;
+        selectedFeatures.forEach(f => { featureCost += (featureCosts[f] || 0); });
+        cost += featureCost;
+        cost *= designMultiplier[design];
+        cost *= speedMultiplier[speed];
+
+        // Round to nearest dollar
+        cost = Math.round(cost);
+
+        // Time estimate: base days + small increments
+        let days = base.days;
+        days += Math.ceil(extraPages * 0.8);
+        days += Math.ceil(selectedFeatures.length * 0.7);
+        // Adjust for speed (rush compresses timeline, flexible adds buffer)
+        if (speed === 'rush') days = Math.max(5, Math.round(days * 0.85));
+        if (speed === 'flexible') days = Math.round(days * 1.1);
+
+        // Suggested plan by rough thresholds
+        const plan = cost < 500 ? 'Basic' : cost <= 1000 ? 'Advanced' : 'Pro';
+
+        // Maintenance note
+        const monthly = maintenance ? maintenanceMonthly[tier] : 0;
+
+        // Render
+        costEl.textContent = `$${cost.toLocaleString()}`;
+        timeEl.textContent = `${days} days`;
+        planEl.textContent = plan;
+        breakdownEl.innerHTML = `
+            <strong>Details:</strong>
+            ${pages} pages (${base.includedPages} included, ${extraPages} extra),
+            features: ${selectedFeatures.length ? selectedFeatures.join(', ') : 'none'},
+            design: ${design}, speed: ${speed}${maintenance ? `, maintenance: $${monthly}/mo` : ''}.
+        `;
+
+        // Highlight corresponding pricing card and add a "Recommended" label
+        const cards = Array.from(document.querySelectorAll('.pricing-card'));
+        cards.forEach(c => {
+            c.classList.remove('recommended');
+            const existing = c.querySelector('.reco-label');
+            if (existing) existing.remove();
+        });
+        const indexMap = { 'Basic': 0, 'Advanced': 1, 'Pro': 2 };
+        const targetIndex = indexMap[plan];
+        const targetCard = cards[targetIndex];
+        if (targetCard) {
+            targetCard.classList.add('recommended');
+            if (!targetCard.querySelector('.reco-label')) {
+                const label = document.createElement('span');
+                label.className = 'reco-label';
+                label.textContent = 'Recommended';
+                targetCard.appendChild(label);
+            }
+        }
+    }
+
+    // Bind changes
+    [pagesInput, complexity, maintenanceInput, ...featureInputs, ...designInputs, ...speedInputs]
+        .filter(Boolean)
+        .forEach(el => el.addEventListener('input', compute));
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            form.reset();
+            pagesLabel.textContent = pagesInput.value;
+            compute();
+        });
+    }
+
+    // Initial compute
+    compute();
 }
 
 // ============================================
@@ -1133,127 +1305,158 @@ function initializeTiltedStacks() {
 }
 
 // ============================================
-// PLAN QUIZ (Pricing page)
+// PROJECT DETAIL RENDERING
 // ============================================
 
-function initializePlanQuiz() {
-    const startBtn = document.getElementById('startPlanQuiz');
-    const panel = document.getElementById('planQuizPanel');
-    const form = document.getElementById('planQuizForm');
-    const steps = form ? Array.from(form.querySelectorAll('.quiz-step')) : [];
-    const submitBtn = document.getElementById('quizSubmit');
-    const resetBtn = document.getElementById('quizReset');
-    const cancelBtn = document.getElementById('quizCancel');
-    const resultBox = document.getElementById('planQuizResult');
-    const resultTitle = document.getElementById('planRecommendationTitle');
-    const resultDesc = document.getElementById('planRecommendationDesc');
-    const applyBtn = document.getElementById('applyRecommendation');
+function renderProjectDetailPage() {
+    if (!document.body || document.body.getAttribute('data-page') !== 'project-detail') return;
 
-    if (!startBtn || !panel || !form || steps.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = (params.get('id') || '').toLowerCase();
+    const data = PROJECTS_DATA[id];
 
-    startBtn.addEventListener('click', () => {
-        panel.hidden = false;
-        // Show all steps at once
-        steps.forEach(step => step.hidden = false);
-        // Ensure buttons are in initial state
-        if (submitBtn) submitBtn.hidden = false;
-        if (resetBtn) resetBtn.hidden = true;
-        resultBox.hidden = true;
-        panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+    const titleEl = document.getElementById('projectTitle');
+    const subtitleEl = document.getElementById('projectSubtitle');
+    const imgEl = document.getElementById('projectImage');
+    const descEl = document.getElementById('projectDescription');
+    const tagsEl = document.getElementById('projectTags');
+    const liveEl = document.getElementById('projectLiveLink');
+    const timelineEl = document.getElementById('projectTimeline');
 
-    // No step navigation; all steps visible
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const pages = form.querySelector('input[name="pages"]:checked')?.value;
-        const timeline = form.querySelector('input[name="timeline"]:checked')?.value;
-        const budget = form.querySelector('input[name="budget"]:checked')?.value;
-        const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(i => i.value);
-
-        const score = { basic: 0, advanced: 0, pro: 0 };
-        // Pages
-        if (pages === '1-3') score.basic += 2; else if (pages === '4-6') score.advanced += 2; else if (pages === '7-10') score.pro += 2;
-        // Timeline
-        if (timeline === 'urgent') { score.basic += 1; score.advanced += 1; }
-        else if (timeline === 'standard') { score.advanced += 2; }
-        else if (timeline === 'extended') { score.pro += 2; }
-        // Features
-        const fCount = features.length;
-        if (fCount <= 1) score.basic += 1; else if (fCount <= 3) score.advanced += 2; else score.pro += 2;
-        // Budget
-        if (budget === 'low') score.basic += 3; else if (budget === 'mid') score.advanced += 3; else if (budget === 'high') score.pro += 3;
-
-        // Pick highest with sensible tie-breaker (Advanced preferred)
-        const entries = Object.entries(score).sort((a, b) => b[1] - a[1]);
-        let recommendation = entries[0][0];
-        if (entries.length > 1 && entries[0][1] === entries[1][1]) {
-            recommendation = 'advanced';
-        }
-
-        // Compose message
-        const labelMap = { basic: 'Basic', advanced: 'Advanced', pro: 'Pro' };
-        resultTitle.textContent = `Recommended: ${labelMap[recommendation]}`;
-        resultDesc.textContent = `Based on your pages, timeline, features, and budget, the ${labelMap[recommendation]} plan should fit well.`;
-        resultBox.hidden = false;
-        if (resetBtn) resetBtn.hidden = false;
-
-        // Hint the recommended plan in the contact message placeholder
-        const messageField = document.getElementById('message');
-        if (messageField) {
-            if (!messageField.dataset.origPlaceholder) {
-                messageField.dataset.origPlaceholder = messageField.placeholder;
-            }
-            messageField.placeholder = `Tell me about your project and which plan you think fits best (Recommended: ${labelMap[recommendation]}).`;
-        }
-
-        // Highlight pricing card
-        const cards = Array.from(document.querySelectorAll('.pricing-card'));
-        cards.forEach(c => c.classList.remove('recommended'));
-        const targetIndex = recommendation === 'basic' ? 0 : recommendation === 'advanced' ? 1 : 2;
-        const targetCard = cards[targetIndex];
-        if (targetCard) {
-            targetCard.classList.add('recommended');
-            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    });
-
-    resetBtn.addEventListener('click', () => {
-        form.reset();
-        resultBox.hidden = true;
-        const cards = Array.from(document.querySelectorAll('.pricing-card'));
-        cards.forEach(c => c.classList.remove('recommended'));
-
-        // Restore original contact message placeholder
-        const messageField = document.getElementById('message');
-        if (messageField && messageField.dataset.origPlaceholder) {
-            messageField.placeholder = messageField.dataset.origPlaceholder;
-        }
-    });
-
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            form.reset();
-            resultBox.hidden = true;
-            panel.hidden = true;
-            const cards = Array.from(document.querySelectorAll('.pricing-card'));
-            cards.forEach(c => c.classList.remove('recommended'));
-
-            // Restore original contact message placeholder
-            const messageField = document.getElementById('message');
-            if (messageField && messageField.dataset.origPlaceholder) {
-                messageField.placeholder = messageField.dataset.origPlaceholder;
-            }
-        });
+    if (!data) {
+        titleEl.textContent = 'Project Not Found';
+        subtitleEl.textContent = 'Please return to the projects page.';
+        if (imgEl) imgEl.style.display = 'none';
+        descEl.textContent = 'We couldn\'t find this project. It may have been moved or renamed.';
+        tagsEl.innerHTML = '';
+        liveEl.style.display = 'none';
+        timelineEl.innerHTML = '';
+        return;
     }
 
-    // If the optional apply button exists, wire it up; otherwise skip
-    if (applyBtn) {
-        applyBtn.addEventListener('click', () => {
-            const contact = document.getElementById('contact');
-            if (contact) contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
+    titleEl.textContent = data.title;
+    subtitleEl.textContent = data.subtitle || 'Details and timeline';
+    imgEl.src = data.image;
+    imgEl.alt = data.title;
+    descEl.textContent = data.description;
+    tagsEl.innerHTML = (data.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    liveEl.href = data.link;
+    timelineEl.innerHTML = (data.timeline || []).map(step => `
+        <li class="timeline-item">
+            <span class="time">${step.date}</span>
+            <div class="title">${step.title}</div>
+            <div class="desc">${step.desc}</div>
+        </li>
+    `).join('');
 }
+
+// Centralized project data used by project.html
+const PROJECTS_DATA = {
+    'haider-cricket': {
+        title: 'Haider Cricket',
+        subtitle: 'E-commerce platform for cricket gear',
+        image: 'images/haider-cricket.jpeg',
+        description: 'Professional cricket gear store with custom jersey designer, premium equipment, and fast delivery for teams. Showcase of bats, gloves, protection gear, and footwear.',
+        tags: ['E-Commerce', 'Custom Design', 'Responsive'],
+        link: 'https://wafflesnzxt.github.io/HaiderCricket/',
+        timeline: [
+            { date: 'Week 1', title: 'Discovery & Scope', desc: 'Aligned requirements, product catalog, and brand direction.' },
+            { date: 'Week 2', title: 'Storefront Build', desc: 'Implemented product listings and responsive layouts.' },
+            { date: 'Week 3', title: 'Customizer & QA', desc: 'Added jersey designer and performed quality assurance.' }
+        ]
+    },
+    'inobex': {
+        title: 'INOBEX',
+        subtitle: 'AI-powered business intelligence',
+        image: 'images/inobex.jpeg',
+        description: 'Predictive analytics platform with scalable cloud infrastructure and real-time dashboards for data-driven decision making.',
+        tags: ['AI/ML', 'Dashboard', 'Enterprise'],
+        link: 'http://inobex.com/',
+        timeline: [
+            { date: 'Phase 1', title: 'Data Modeling', desc: 'Defined metrics and ingestion pipelines.' },
+            { date: 'Phase 2', title: 'Dashboard UX', desc: 'Built interactive visualizations and filters.' },
+            { date: 'Phase 3', title: 'Performance & Launch', desc: 'Optimized queries and deployed to production.' }
+        ]
+    },
+    'brain-rot-dictionary': {
+        title: 'Brain-Rot Dictionary',
+        subtitle: 'Interactive modern slang dictionary',
+        image: 'images/brain-rot-dictionary.jpeg',
+        description: 'Educational platform decoding modern slang and internet terminology with searchable categories from TikTok, gaming, memes, and more.',
+        tags: ['Interactive', 'Educational', 'Search'],
+        link: 'https://wafflesnzxt.github.io/Brain-Rot-Dictionary/',
+        timeline: [
+            { date: 'Sprint 1', title: 'Schema & Terms', desc: 'Curated categories and term metadata.' },
+            { date: 'Sprint 2', title: 'Search & Filters', desc: 'Implemented fast client-side search and tagging.' },
+            { date: 'Sprint 3', title: 'Polish', desc: 'Refined UX and accessibility.' }
+        ]
+    },
+    'bassl': {
+        title: 'BASSL',
+        subtitle: 'Modern web platform',
+        image: 'images/bassl.jpeg',
+        description: 'Comprehensive web platform featuring modern design, seamless user experience, and professional branding.',
+        tags: ['Web App', 'Design', 'UX'],
+        link: 'https://wafflesnzxt.github.io/BASSL/',
+        timeline: [
+            { date: 'Design', title: 'Brand & UI', desc: 'Established visual language and components.' },
+            { date: 'Build', title: 'Implementation', desc: 'Developed responsive views and navigation.' },
+            { date: 'QA', title: 'Refinement', desc: 'Fixed edge cases and improved performance.' }
+        ]
+    },
+    'profilelift': {
+        title: 'ProfileLift',
+        subtitle: 'GBP optimization service',
+        image: 'images/profilelift.jpeg',
+        description: 'Google Business Profile optimization with photo management, content enhancement, and performance tracking.',
+        tags: ['SaaS', 'Service', 'Marketing'],
+        link: 'https://wafflesnzxt.github.io/ProfileLift/',
+        timeline: [
+            { date: 'Kickoff', title: 'Goals & KPIs', desc: 'Defined optimization targets and metrics.' },
+            { date: 'Build', title: 'Service Site', desc: 'Implemented offerings, testimonials, and contact.' },
+            { date: 'Iterate', title: 'Analytics', desc: 'Added tracking and iteration loop.' }
+        ]
+    },
+    'zen-habit': {
+        title: 'Zen Habit',
+        subtitle: 'Mindfulness habit app',
+        image: 'images/zen-habit.jpeg',
+        description: 'Mindfulness and wellness app with daily micro-challenges, guided meditation, habit tracking, and progress streaks.',
+        tags: ['Wellness', 'Habits', 'Tracking'],
+        link: 'https://wafflesnzxt.github.io/Zen-Habit/',
+        timeline: [
+            { date: 'Week 1', title: 'Core Flows', desc: 'Built habit tracking and streak logic.' },
+            { date: 'Week 2', title: 'Content', desc: 'Added guided meditation and prompts.' },
+            { date: 'Week 3', title: 'UX Polish', desc: 'Improved mobile experience and animations.' }
+        ]
+    },
+    'imam-hussain': {
+        title: 'Imam Hussain (as)',
+        subtitle: 'Educational memorial website',
+        image: 'images/imam-hussain.jpeg',
+        description: 'Memorial site honoring the legacy of Imam Hussain with historical timeline, Karbala narrative, quotes, and teachings.',
+        tags: ['Educational', 'History', 'Heritage'],
+        link: 'https://wafflesnzxt.github.io/ImamHussain.as/',
+        timeline: [
+            { date: 'Research', title: 'Content Gathering', desc: 'Curated historical sources and quotes.' },
+            { date: 'Build', title: 'Layout & Narrative', desc: 'Structured timeline and story flow.' },
+            { date: 'Finalize', title: 'Accessibility', desc: 'Improved readability and contrast.' }
+        ]
+    },
+    'car-search-engine': {
+        title: 'Car Search Engine',
+        subtitle: 'Advanced vehicle finder',
+        image: 'images/Screenshot_30-12-2025_121048_wafflesnzxt.github.io.jpeg',
+        description: 'Search engine for auto vehicles with comprehensive filtering by price, size, seats, color, and more.',
+        tags: ['Search Engine', 'Automotive', 'Filters'],
+        link: 'https://wafflesnzxt.github.io/CarSearchEngine/',
+        timeline: [
+            { date: 'Planning', title: 'Filter Design', desc: 'Defined attributes and UI for filters.' },
+            { date: 'Build', title: 'Search Engine', desc: 'Implemented indexing and filtering.' },
+            { date: 'Polish', title: 'Performance', desc: 'Optimized data and results rendering.' }
+        ]
+    }
+};
+
 console.log('%c👨‍💻 Welcome to my portfolio!', 'font-size: 20px; color: #16c784; font-weight: bold;');
 console.log('%cLooking to hire? Reach out at: contact@example.com', 'font-size: 14px; color: #667eea;');

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Detail - Portfolio</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+</head>
+<body data-page="project-detail">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo" aria-label="Home">
+                <span class="logo-bracket">&lt;</span>
+                <span class="logo-text">Wafi Syed</span>
+                <span class="logo-bracket">/&gt;</span>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="projects.html" class="nav-link">Projects</a></li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="hire.html" class="nav-link nav-link-btn">Hire Me</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="abstract-bg"></div>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1 id="projectTitle">Project</h1>
+            <p id="projectSubtitle">Details and timeline</p>
+        </div>
+    </section>
+
+    <section class="project-detail" id="projectDetail">
+        <div class="container">
+            <div class="detail-header">
+                <div class="detail-media">
+                    <img id="projectImage" src="" alt="" class="detail-img" />
+                </div>
+                <div class="detail-summary">
+                    <p id="projectDescription" class="detail-desc"></p>
+                    <div id="projectTags" class="project-tags"></div>
+                    <div class="detail-actions">
+                        <a id="projectLiveLink" href="#" target="_blank" class="btn btn-primary">Open Live Site</a>
+                        <a href="projects.html" class="btn btn-secondary">Back to Projects</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h2 class="timeline-title">Project Timeline</h2>
+                <ol id="projectTimeline" class="timeline-list"></ol>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Wafi Syed Portfolio. Built with passion and code.</p>
+            <div class="social-links">
+                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank">GitHub</a>
+                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -41,6 +41,7 @@
    ============================================ */
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* prevent sideways scroll on mobile */
 }
 
 body {
@@ -234,6 +235,7 @@ h3 {
     align-items: center;
     gap: 0.4rem;
     letter-spacing: -0.5px;
+    text-decoration: none; /* ensure anchor has no underline */
 }
 
 .logo-bracket {
@@ -306,6 +308,7 @@ h3 {
     flex-direction: column;
     cursor: pointer;
     gap: 6px;
+    z-index: 300; /* keep burger above content on all pages */
 }
 
 .hamburger span {
@@ -489,33 +492,31 @@ section {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--border-light);
-    border-radius: 50%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    opacity: 0.75;
+    align-items: flex-end;
+    gap: 10px;
+    color: #fff;
+    opacity: 0.9;
     transition: all 0.3s ease;
     pointer-events: auto;
-    animation: cuePulse 2.8s ease-in-out infinite;
     text-decoration: none;
 }
 
 .scroll-cue:hover {
     opacity: 1;
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
     transform: translateX(-50%) translateY(-2px);
 }
 
-.scroll-cue span {
-    display: block;
+.scroll-cue .curved-arrow {
+    width: 72px;
+    height: auto;
+}
+
+.scroll-cue .handwriting {
+    font-family: 'Caveat', cursive;
     font-size: 1.2rem;
-    line-height: 1;
-    animation: cueBounce 2.8s ease-in-out infinite;
+    color: #fff;
+    transform: rotate(-5deg);
 }
 
 @keyframes cuePulse {
@@ -998,6 +999,7 @@ section {
     text-align: center;
     border-bottom: 1px solid var(--border-color);
     animation: fadeInUp 0.8s ease-out;
+    position: relative;
 }
 
 .page-hero h1 {
@@ -1373,15 +1375,27 @@ section {
     transition: transform 0.4s ease;
 }
 
-.collage-item:hover {
-    border-color: var(--text-primary);
-    box-shadow: 0 12px 32px rgba(14, 165, 233, 0.3);
-    transform: translateY(-8px) scale(1.02);
-    z-index: 10;
-}
+@media (hover: hover) and (pointer: fine) {
+    .collage-item:hover {
+        border-color: var(--text-primary);
+        box-shadow: 0 12px 32px rgba(14, 165, 233, 0.3);
+        transform: translateY(-8px);
+        z-index: 10;
+        cursor: zoom-in;
+    }
 
-.collage-item:hover img {
-    transform: scale(1.05);
+    .collage-item:hover img {
+        transform: none;
+    }
+
+    /* Actual size growth per item while keeping center roughly anchored */
+    .item-1:hover { width: 350px; height: 310px; top: 5px; left: -15px; }
+    .item-2:hover { width: 310px; height: 350px; top: 65px; right: -15px; }
+    .item-3:hover { width: 330px; height: 280px; bottom: 25px; left: 305px; }
+    .item-4:hover { width: 370px; height: 320px; top: 265px; }
+    .item-5:hover { width: 290px; height: 330px; bottom: 5px; right: -5px; }
+    .item-6:hover { width: 310px; height: 270px; top: 335px; left: 85px; }
+    .item-7:hover { width: 320px; height: 340px; top: 65px; right: 405px; }
 }
 
 /* Asymmetrical collage layout */
@@ -1963,11 +1977,24 @@ section {
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    flex-wrap: nowrap;
 }
 
 .faq-page-indicator {
     color: var(--text-secondary);
     font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Ensure pagination buttons don’t stretch on mobile */
+.faq-pagination .btn {
+    width: auto;
+    flex: 0 0 auto;
+}
+
+@media (max-width: 480px) {
+    .faq-pagination { gap: 0.5rem; }
+    .faq-page-indicator { font-size: 0.9rem; }
 }
 
 .faq-pagination .btn[disabled] {
@@ -2475,11 +2502,21 @@ section {
 
     .hero-buttons {
         flex-direction: column;
+        align-items: center;
     }
 
     .btn {
-        width: 100%;
+        width: auto;
+        max-width: 92%;
         text-align: center;
+    }
+
+    /* Banners: add side breathing room on small screens */
+    .page-hero .container,
+    .cta .container,
+    .cta.cta-secondary .container {
+        max-width: 92%;
+        margin: 0 auto;
     }
 
     .nav-menu {
@@ -2501,14 +2538,21 @@ section {
     }
     .project-card {
         position: static;
-        width: 100%;
+        width: 92%;
         height: auto;
+        margin: 0 auto;
     }
     .project-image {
         height: 160px;
     }
     .project-info {
         padding: 1.2rem;
+    }
+
+    /* Featured carousel cards: keep full-width for correct slide translate */
+    .featured-card {
+        flex: 0 0 100%;
+        min-width: 100%;
     }
 
     /* About intro: stack and center profile */
@@ -2555,10 +2599,13 @@ section {
 
     .container {
         padding: 0 1.5rem;
+        overflow-x: hidden;
     }
 
     .nav-container {
         padding: 0 1rem;
+        overflow-x: hidden;
+        max-width: 100vw;
     }
 
     .hamburger {
@@ -2688,6 +2735,10 @@ section {
     }
 
     /* Responsive carousel for mobile */
+    .carousel-container {
+        padding: 0;
+        overflow-x: hidden;
+    }
     .carousel-arrow {
         width: 35px;
         height: 35px;
@@ -2695,11 +2746,19 @@ section {
     }
 
     .carousel-prev {
-        left: 5px;
+        left: 12px;
     }
 
     .carousel-next {
-        right: 5px;
+        right: 12px;
+    }
+
+    /* Clip slides correctly on mobile */
+    .carousel-container {
+        overflow: hidden;
+    }
+    .featured-carousel {
+        overflow: visible;
     }
 
     .carousel-indicators {
@@ -2718,65 +2777,9 @@ section {
 }
 
 /* ============================================
-   PLAN QUIZ STYLES
+   PLAN QUIZ STYLES (removed UI)
+   Keeping recommended card styles below
    ============================================ */
-.plan-quiz {
-    margin-top: 0.75rem; /* tighten gap above quiz CTA */
-    max-width: 700px; /* reduce overall panel width */
-    margin-left: auto;
-    margin-right: auto; /* center within container */
-}
-.quiz-cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-.quiz-cta p {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-.quiz-panel {
-    background: var(--primary-card);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
-}
-.quiz-panel h3 {
-    margin-bottom: 1rem;
-}
-.quiz-step {
-    display: grid;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-.quiz-step h4 {
-    margin-bottom: 0.5rem;
-    color: var(--accent-blue);
-}
-.quiz-actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-}
-.quiz-result {
-    margin-top: 1rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
-}
-
-/* Subtle note under quiz result */
-.quiz-note {
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    margin-top: 0.5rem;
-    font-weight: 500;
-}
-.quiz-note a {
-    color: var(--accent-blue);
-    text-decoration: underline;
-}
 
 /* Highlight recommended pricing card */
 .pricing-card.recommended {
@@ -2785,15 +2788,213 @@ section {
     position: relative;
     overflow: visible; /* ensure 'Recommended' label is not clipped */
 }
-.pricing-card.recommended::before {
-    content: 'Recommended';
+.pricing-card.recommended::before { content: none; }
+
+/* Dynamic Recommended label element for compatibility with featured ::before */
+.pricing-card .reco-label {
     position: absolute;
-    top: -10px; /* nudge slightly to avoid cut-off */
-    left: 12px;
+    top: 10px;
+    right: 12px;
     background: var(--accent-blue);
     color: #fff;
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
     font-size: 0.8rem;
     font-weight: 600;
+    z-index: 2;
+}
+
+/* Section cue (inline, centered) */
+.section-cue {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 24px auto 0 auto;
+}
+
+.section-cue a {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.section-cue a:hover {
+    transform: translateY(-2px);
+    opacity: 1;
+}
+
+.section-cue .curved-arrow {
+    width: 72px;
+    height: auto;
+}
+
+.section-cue .handwriting {
+    font-family: 'Caveat', cursive;
+    font-size: 1.2rem;
+    color: #fff;
+    transform: rotate(-5deg);
+}
+
+/* Slightly larger handwriting for sticky cues (About + Hire) */
+.sticky-cue .handwriting {
+    font-size: 1.4rem;
+}
+
+/* Rotation indicator shown above projects grid (desktop only) */
+.rotation-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    margin: 0 auto 12px auto;
+    width: fit-content;
+    opacity: 0.8;
+}
+.rotation-indicator .rotate-icon {
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@media (min-width: 769px) {
+    .rotation-indicator { display: flex; }
+}
+
+.rotation-indicator .rotation-tip {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Sticky variant to keep the cue always visible while approaching contact */
+.sticky-cue {
+    position: sticky;
+    bottom: 16px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* ============================================
+   PROJECT DETAIL + TIMELINE
+   ============================================ */
+.project-detail { padding: 80px 0; }
+.detail-header { display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: start; }
+.detail-media { background: var(--primary-card); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+.detail-img { width: 100%; height: 360px; object-fit: cover; display: block; }
+.detail-summary { background: var(--primary-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; }
+.detail-desc { color: var(--text-secondary); margin-bottom: 1rem; }
+.detail-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+.timeline { margin-top: 2.5rem; }
+.timeline-title { font-size: 1.6rem; margin-bottom: 1rem; }
+.timeline-list { list-style: none; position: relative; padding-left: 1.5rem; }
+.timeline-list::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--border-light); }
+.timeline-item { position: relative; margin-bottom: 1rem; padding-left: 0.75rem; }
+.timeline-item::before { content: ''; position: absolute; left: -1px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-blue); box-shadow: 0 0 0 3px rgba(14,165,233,0.15); }
+.timeline-item .time { display: inline-block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+.timeline-item .title { font-weight: 600; margin-bottom: 0.15rem; }
+.timeline-item .desc { color: var(--text-secondary); font-size: 0.95rem; }
+
+@media (max-width: 768px) {
+    .detail-header { grid-template-columns: 1fr; }
+    .detail-img { height: 220px; }
+}
+
+/* ============================================
+   MICRO INTERACTIONS: Ripple, Reveal
+   ============================================ */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: rgba(255,255,255,0.2);
+    width: 10px;
+    height: 10px;
+    animation: rippleExpand 500ms ease-out forwards;
+}
+
+@keyframes rippleExpand {
+    from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.5); }
+    to { opacity: 0; transform: translate(-50%, -50%) scale(20); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ripple { animation: none; opacity: 0.12; }
+}
+
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.revealed { opacity: 1; transform: translateY(0); }
+
+/* ============================================
+   BUILD ESTIMATOR
+   ============================================ */
+.build-estimator h2 { margin-bottom: 1.5rem; }
+
+.estimator-form {
+    background: var(--primary-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.estimator-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.estimator-group {
+    background: var(--primary-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.estimator-group h3 { margin-bottom: 0.75rem; font-size: 1.1rem; }
+.estimator-group label { display: block; margin: 0.5rem 0 0.25rem; font-weight: 600; font-size: 0.9rem; }
+.estimator-group select, .estimator-group input[type="range"] {
+    width: 100%;
+    background: var(--primary-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+}
+.pages-input { display: flex; align-items: center; gap: 0.75rem; }
+.pages-input span { color: var(--text-secondary); font-weight: 600; }
+
+.feature-list { display: grid; grid-template-columns: 1fr; gap: 0.4rem; }
+.feature-list label { font-weight: 500; color: var(--text-secondary); }
+.feature-list input { margin-right: 0.5rem; }
+
+.radio-list { display: grid; gap: 0.75rem; }
+.radio-title { display: block; color: var(--text-secondary); font-weight: 600; margin-bottom: 0.25rem; }
+.radio-list label { margin-right: 0.75rem; font-weight: 500; color: var(--text-secondary); }
+.radio-list .inline { font-weight: 600; }
+
+.estimator-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+.estimator-result {
+    margin-top: 1rem;
+    background: var(--primary-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.result-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.result-card { background: var(--primary-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.9rem; text-align: center; }
+.result-label { color: var(--text-secondary); font-size: 0.85rem; }
+.result-value { font-size: 1.4rem; font-weight: 700; color: var(--accent-blue); }
+.result-breakdown { margin-top: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
+.estimator-note { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+@media (max-width: 768px) {
+    .estimator-grid { grid-template-columns: 1fr; }
+    .result-row { grid-template-columns: 1fr; }
 }

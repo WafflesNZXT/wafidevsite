@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - Portfolio</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo">
+            <a href="index.html" class="nav-logo" aria-label="Home">
                 <span class="logo-bracket">&lt;</span>
                 <span class="logo-text">Wafi Syed</span>
                 <span class="logo-bracket">/&gt;</span>
-            </div>
+            </a>
             <ul class="nav-menu">
                 <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="projects.html" class="nav-link active">Projects</a></li>
@@ -35,9 +39,18 @@
             <h1>My Projects</h1>
             <p>A showcase of my finest web development work</p>
         </div>
+        
     </section>
 
-    <section class="projects">
+    <section class="projects" id="projects">
+        <div class="rotation-indicator">
+            <svg class="rotate-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 10 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 2v5m0-5h5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>cards rotate</span>
+            <span class="rotation-tip">hover over a card to stop the rotation</span>
+        </div>
         <div class="container">
             <div class="projects-grid">
                 <div class="project-card">
@@ -52,7 +65,7 @@
                             <span class="tag">Custom Design</span>
                             <span class="tag">Responsive</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/HaiderCricket/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=haider-cricket" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -68,7 +81,7 @@
                             <span class="tag">Dashboard</span>
                             <span class="tag">Enterprise</span>
                         </div>
-                        <a href="http://inobex.com/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=inobex" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -84,7 +97,7 @@
                             <span class="tag">Educational</span>
                             <span class="tag">Search</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/Brain-Rot-Dictionary/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=brain-rot-dictionary" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -100,7 +113,7 @@
                             <span class="tag">Design</span>
                             <span class="tag">UX</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/BASSL/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=bassl" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -116,7 +129,7 @@
                             <span class="tag">Service</span>
                             <span class="tag">Marketing</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/ProfileLift/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=profilelift" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -132,7 +145,7 @@
                             <span class="tag">Habits</span>
                             <span class="tag">Tracking</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/Zen-Habit/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=zen-habit" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -148,7 +161,7 @@
                             <span class="tag">History</span>
                             <span class="tag">Heritage</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/ImamHussain.as/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=imam-hussain" class="project-link">View Project →</a>
                     </div>
                 </div>
 
@@ -164,7 +177,7 @@
                             <span class="tag">Automotive</span>
                             <span class="tag">Filters</span>
                         </div>
-                        <a href="https://wafflesnzxt.github.io/CarSearchEngine/" target="_blank" class="project-link">View Project →</a>
+                        <a href="project.html?id=car-search-engine" class="project-link">View Project →</a>
                     </div>
                 </div>
         </div>
