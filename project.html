@@ -11,6 +11,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 </head>
 <body data-page="project-detail">
+    <!-- Loading Overlay -->
+    <div id="loader" class="loader-overlay" aria-live="polite" role="status">
+        <div class="loader-box">
+            <div class="loader-header">
+                <span class="loader-title">Loading</span>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress" style="width:0%"></div>
+            </div>
+            <div class="loader-info">
+                <span class="loader-percent">0%</span>
+                <span class="loader-status">Initializing...</span>
+            </div>
+        </div>
+    </div>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo" aria-label="Home">

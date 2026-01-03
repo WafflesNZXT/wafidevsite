@@ -5,6 +5,7 @@
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
+    initializeLoader();
     initializeNavigation();
     initializeContactForm();
     observeAnimations();
@@ -22,6 +23,114 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeBuildEstimator();
     renderProjectDetailPage();
 });
+
+// ============================================
+// LOADER OVERLAY
+// ============================================
+function initializeLoader() {
+    const overlay = document.getElementById('loader');
+    if (!overlay) return;
+    // Only show on first visit. Persist across refreshes and navigation.
+    const LOADER_KEY = 'wafi_loader_shown';
+    const hasShown = sessionStorage.getItem(LOADER_KEY) === '1';
+    if (hasShown) {
+        // Remove overlay immediately if already shown
+        overlay.remove();
+        document.body.style.cursor = '';
+        return;
+    }
+
+    const progressEl = overlay.querySelector('.loader-progress');
+    const percentEl = overlay.querySelector('.loader-percent');
+    const statusEl = overlay.querySelector('.loader-status');
+    const minDuration = 6000; // minimum time the loader should be visible (ms)
+    const startTime = Date.now();
+    let rafId = null;
+
+    // Mark as shown at start to avoid showing again on immediate navigation
+    try { sessionStorage.setItem(LOADER_KEY, '1'); } catch (_) {}
+
+    // Fun cycling messages
+    const statuses = [
+        'Loading images…',
+        'Warming up code…',
+        'Loading Wafi…',
+        'Sharpening pixels…',
+        'Compiling awesomeness…',
+        'Fetching vibes…',
+        'Tuning animations…',
+        'Optimizing rockets…'
+    ];
+    let statusIndex = 0;
+    statusEl.textContent = statuses[0];
+    const cycleTimer = setInterval(() => {
+        statusIndex = (statusIndex + 1) % statuses.length;
+        statusEl.textContent = statuses[statusIndex];
+    }, 1200);
+
+    // Progress based on images + DOM ready
+    const images = Array.from(document.images);
+    let loaded = 0;
+    const total = images.length + 1; // +1 for DOM ready step
+
+    function gatedPercent() {
+        const elapsed = Date.now() - startTime;
+        const timeGate = Math.min(0.95, (elapsed / minDuration) * 0.95); // max 95% until minDuration
+        const actual = total > 0 ? (loaded / total) : 1;
+        const display = Math.min(actual, timeGate);
+        return Math.round(display * 100);
+    }
+
+    function updateProgress() {
+        const pct = gatedPercent();
+        progressEl.style.width = pct + '%';
+        percentEl.textContent = pct + '%';
+    }
+
+    function tick() {
+        updateProgress();
+        rafId = requestAnimationFrame(tick);
+    }
+    rafId = requestAnimationFrame(tick);
+
+    // Mark DOM ready
+    loaded += 1;
+    updateProgress();
+
+    images.forEach(img => {
+        if (img.complete) {
+            loaded += 1;
+            updateProgress();
+        } else {
+            img.addEventListener('load', () => { loaded += 1; updateProgress(); });
+            img.addEventListener('error', () => { loaded += 1; updateProgress(); });
+        }
+    });
+
+    function finish() {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, minDuration - elapsed);
+        setTimeout(() => {
+            clearInterval(cycleTimer);
+            if (rafId) cancelAnimationFrame(rafId);
+            progressEl.style.width = '100%';
+            percentEl.textContent = '100%';
+            setTimeout(() => {
+                overlay.classList.add('fade-out');
+                setTimeout(() => { overlay.remove(); }, 500);
+                document.body.style.cursor = '';
+            }, 250);
+        }, remaining);
+    }
+
+    // Ensure finalization when page fully loaded
+    window.addEventListener('load', finish);
+
+    // Safety timeout in case some assets never report
+    setTimeout(() => {
+        if (!overlay.classList.contains('fade-out')) finish();
+    }, 15000);
+}
 
 // ============================================
 // NAVIGATION FUNCTIONALITY

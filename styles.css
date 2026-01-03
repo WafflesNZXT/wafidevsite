@@ -2998,3 +2998,85 @@ section {
     .estimator-grid { grid-template-columns: 1fr; }
     .result-row { grid-template-columns: 1fr; }
 }
+/* ============================================
+   LOADER OVERLAY
+   ============================================ */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(1200px 800px at 20% 20%, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.06) 40%, rgba(14,165,233,0.02) 60%, transparent 70%),
+                linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0.98));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    visibility: visible;
+    opacity: 1;
+}
+
+.loader-overlay.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loader-box {
+    width: min(560px, 90vw);
+    background: var(--primary-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    padding: 1.25rem 1.25rem 1.1rem;
+}
+
+.loader-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.loader-title {
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.loader-bar {
+    position: relative;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--border-color);
+    overflow: hidden;
+}
+
+.loader-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+    box-shadow: 0 0 18px rgba(14,165,233,0.5);
+    transition: width 0.25s ease;
+}
+
+.loader-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.loader-percent {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.loader-status {
+    color: var(--accent-blue);
+}
