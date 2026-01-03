@@ -9,8 +9,54 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+        <!-- JSON-LD Breadcrumbs -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://wafisyed.dev/"},
+                {"@type": "ListItem", "position": 2, "name": "Hire Me", "item": "https://wafisyed.dev/hire.html"}
+            ]
+        }
+        </script>
 </head>
 <body>
+    <!-- Inline SVG sprite for contact icons (ensures visibility when opened via file://) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+        <symbol id="phone" viewBox="0 0 24 24">
+            <path d="M6 2h6l2 4-3 2c1 2 3 4 5 5l2-3 4 2v6c-8 1-16-7-16-16z"/>
+        </symbol>
+        <symbol id="share" viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <path d="M8.5 11l7-4"/>
+            <path d="M8.5 13l7 4"/>
+        </symbol>
+        <symbol id="clock" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v6l4 2"/>
+        </symbol>
+        <symbol id="globe" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M3 12h18"/>
+            <path d="M12 3a14 14 0 0 0 0 18"/>
+            <path d="M12 3a14 14 0 0 1 0 18"/>
+        </symbol>
+        <symbol id="github" viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 0 0-3 19c.5.1.7-.2.7-.5v-2c-3 .7-3.6-1.3-3.6-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .8.1-.7.4-1.1.7-1.3-2.4-.3-5-1.2-5-5.4 0-1.2.4-2.1 1.1-2.9-.1-.3-.5-1.5.1-3.1 0 0 .9-.3 3 .1a10.4 10.4 0 0 1 5.4 0c2.1-.4 3-.1 3-.1.6 1.6.2 2.8.1 3.1.7.8 1.1 1.7 1.1 2.9 0 4.2-2.6 5.1-5 5.4.4.3.8 1 .8 2.1v3.1c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/>
+        </symbol>
+        <symbol id="linkedin" viewBox="0 0 24 24">
+            <circle cx="8" cy="9" r="1"/>
+            <path d="M7 17h2v-6H7z"/>
+            <path d="M12 17h2v-3a2 2 0 0 1 4 0v3h2v-4a4 4 0 0 0-8 0z"/>
+        </symbol>
+        <symbol id="copy" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="10" height="10" rx="2"/>
+            <rect x="5" y="5" width="10" height="10" rx="2"/>
+        </symbol>
+    </svg>
     <!-- Loading Overlay -->
     <div id="loader" class="loader-overlay" aria-live="polite" role="status">
         <div class="loader-box">
@@ -66,32 +112,32 @@
                 <h2>How I Can Help</h2>
                 <div class="services-list">
                     <div class="service">
-                        <div class="service-icon">💻</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#uiux"></use></svg></div>
                         <h3>Custom Websites</h3>
                         <p>Tailored web solutions built from scratch to match your unique business needs and goals.</p>
                     </div>
                     <div class="service">
-                        <div class="service-icon">🎨</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#design"></use></svg></div>
                         <h3>Web Design</h3>
                         <p>Modern, responsive designs that look stunning on all devices and engage your audience.</p>
                     </div>
                     <div class="service">
-                        <div class="service-icon">⚙️</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#dev"></use></svg></div>
                         <h3>Development</h3>
                         <p>Clean, efficient code built with best practices for performance, security, and scalability.</p>
                     </div>
                     <div class="service">
-                        <div class="service-icon">🛠️</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#maintenance"></use></svg></div>
                         <h3>Maintenance</h3>
                         <p>Ongoing support and updates to keep your website running smoothly and securely.</p>
                     </div>
                     <div class="service">
-                        <div class="service-icon">📡</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#ecommerce"></use></svg></div>
                         <h3>E-Commerce</h3>
                         <p>Powerful online stores with secure payments and inventory management systems.</p>
                     </div>
                     <div class="service">
-                        <div class="service-icon">⚡</div>
+                        <div class="service-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#optimize"></use></svg></div>
                         <h3>Optimization</h3>
                         <p>Speed optimization and performance tuning for maximum user experience and SEO.</p>
                     </div>
@@ -186,7 +232,7 @@
             <h2>Pricing Packages</h2>
             <div class="pricing-cards">
                 <div class="pricing-card">
-                        <div class="tier-icon">🌱</div>
+                        <div class="tier-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#seedling"></use></svg></div>
                     <h3>Basic</h3>
                     <div class="price">$399</div>
                     <p class="price-desc">One-time setup • 5–7 Business Days</p>
@@ -207,7 +253,7 @@
                 </div>
                 <div class="pricing-card featured">
                     <div class="badge">Most Popular</div>
-                        <div class="tier-icon">🚀</div>
+                        <div class="tier-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#rocket"></use></svg></div>
                     <h3>Advanced</h3>
                     <div class="price">$599</div>
                     <p class="price-desc">One-time setup • 10–14 Business Days</p>
@@ -227,7 +273,7 @@
                     </ul>
                 </div>
                 <div class="pricing-card">
-                        <div class="tier-icon">🏆</div>
+                        <div class="tier-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#trophy"></use></svg></div>
                     <h3>Pro</h3>
                     <div class="price">$1,199</div>
                     <p class="price-desc">One-time setup • 14–21 Business Days</p>
@@ -268,7 +314,7 @@
         <div class="container">
             <h2>Get In Touch</h2>
             <div class="contact-wrapper">
-                <form class="contact-form" id="contactForm" action="https://formspree.io/f/mnjqkboj" method="post">
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/mnjqkboj" method="post" novalidate>
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" id="name" name="name" placeholder="John Doe" required>
@@ -287,27 +333,30 @@
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                     <div class="form-message" id="formMessage"></div>
+                    <div class="form-errors" id="formErrors" role="alert" aria-live="polite"></div>
                 </form>
 
                 <div class="contact-info">
                     <h3>Let's Connect</h3>
                     <div class="contact-item">
-                        <h4>📞 Phone</h4>
-                        <p><a href="tel:+15107318687">+1 (510) 731-8687 (Recommended)</a></p>
+                        <h4><svg class="icon" aria-hidden="true" focusable="false"><use href="#phone"></use></svg> Phone</h4>
+                        <p><a href="tel:+15107318687" class="phone-link" data-number="+15107318687">+1 (510) 731-8687 (Recommended)</a> 
+                        <button type="button" class="icon-btn copy-btn" data-number="+15107318687" aria-label="Copy phone number"><svg class="icon" aria-hidden="true"><use href="#copy"></use></svg> Copy</button></p>
+                        <input type="text" name="website" id="website" autocomplete="off" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px;opacity:0;" />
                     </div>
                     <div class="contact-item">
-                        <h4>💼 Social</h4>
+                        <h4><svg class="icon" aria-hidden="true" focusable="false"><use href="#share"></use></svg> Social</h4>
                         <div class="social-icons">
-                            <a href="https://github.com/WafflesNZXT" class="social-icon" target="_blank">GitHub</a>
-                            <a href="https://www.linkedin.com/in/wafisyed/" class="social-icon" target="_blank">LinkedIn</a>
+                            <a href="https://github.com/WafflesNZXT" class="social-icon" target="_blank"><svg class="icon" aria-hidden="true"><use href="#github"></use></svg> GitHub</a>
+                            <a href="https://www.linkedin.com/in/wafisyed/" class="social-icon" target="_blank"><svg class="icon" aria-hidden="true"><use href="#linkedin"></use></svg> LinkedIn</a>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <h4>⏱️ Availability</h4>
+                        <h4><svg class="icon" aria-hidden="true" focusable="false"><use href="#clock"></use></svg> Availability</h4>
                         <p>I typically respond within 24 hours.</p>
                     </div>
                     <div class="contact-item">
-                        <h4>🌍 Based In</h4>
+                        <h4><svg class="icon" aria-hidden="true" focusable="false"><use href="#globe"></use></svg> Based In</h4>
                         <p>Bay Area, California, but available for remote work, worldwide.</p>
                     </div>
                 </div>
@@ -318,9 +367,18 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 Wafi Syed Portfolio. Built with passion and code.</p>
+            <div class="footer-links" aria-label="Quick Links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="about.html">About</a>
+                <a href="hire.html">Hire Me</a>
+            </div>
+                <div style="margin-top:0.75rem;">
+                    <button class="icon-btn" data-copy="site" aria-label="Copy site URL"><svg class="icon" aria-hidden="true"><use href="#copy"></use></svg> Copy Site URL</button>
+                </div>
             <div class="social-links">
-                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank">LinkedIn</a>
+                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#github"></use></svg> GitHub</a>
+                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#linkedin"></use></svg> LinkedIn</a>
             </div>
         </div>
     </footer>

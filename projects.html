@@ -9,6 +9,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+        <!-- JSON-LD Breadcrumbs -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://wafisyed.dev/"},
+                {"@type": "ListItem", "position": 2, "name": "Projects", "item": "https://wafisyed.dev/projects.html"}
+            ]
+        }
+        </script>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -61,6 +72,20 @@
     </section>
 
     <section class="projects" id="projects">
+        <div class="container">
+            <div class="filters" role="group" aria-label="Filter projects">
+                <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+                <button class="filter-btn" data-filter="e-commerce" aria-pressed="false">E-Commerce</button>
+                <button class="filter-btn" data-filter="ai-ml" aria-pressed="false">AI/ML</button>
+                <button class="filter-btn" data-filter="interactive" aria-pressed="false">Interactive</button>
+                <button class="filter-btn" data-filter="web-app" aria-pressed="false">Web App</button>
+                <button class="filter-btn" data-filter="saas" aria-pressed="false">SaaS</button>
+                <button class="filter-btn" data-filter="wellness" aria-pressed="false">Wellness</button>
+                <button class="filter-btn" data-filter="educational" aria-pressed="false">Educational</button>
+                <button class="filter-btn" data-filter="search" aria-pressed="false">Search</button>
+                <button class="filter-btn" data-filter="automotive" aria-pressed="false">Automotive</button>
+            </div>
+        </div>
         <div class="rotation-indicator">
             <svg class="rotate-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 2a10 10 0 1 0 10 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -71,9 +96,9 @@
         </div>
         <div class="container">
             <div class="projects-grid">
-                <div class="project-card">
+                <div class="project-card" data-tags="e-commerce,custom-design,responsive">
                     <div class="project-image">
-                        <img src="images/haider-cricket.jpeg" alt="Haider Cricket" class="project-img">
+                        <img src="images/haider-cricket.jpeg" alt="Haider Cricket" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>Haider Cricket</h3>
@@ -87,9 +112,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="ai-ml,dashboard,enterprise">
                     <div class="project-image">
-                        <img src="images/inobex.jpeg" alt="INOBEX" class="project-img">
+                        <img src="images/inobex.jpeg" alt="INOBEX" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>INOBEX</h3>
@@ -103,9 +128,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="interactive,educational,search">
                     <div class="project-image">
-                        <img src="images/brain-rot-dictionary.jpeg" alt="Brain-Rot Dictionary" class="project-img">
+                        <img src="images/brain-rot-dictionary.jpeg" alt="Brain-Rot Dictionary" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>Brain-Rot Dictionary</h3>
@@ -119,9 +144,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="web-app,design,ux">
                     <div class="project-image">
-                        <img src="images/bassl.jpeg" alt="BASSL" class="project-img">
+                        <img src="images/bassl.jpeg" alt="BASSL" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>BASSL</h3>
@@ -135,9 +160,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="saas,service,marketing">
                     <div class="project-image">
-                        <img src="images/profilelift.jpeg" alt="ProfileLift" class="project-img">
+                        <img src="images/profilelift.jpeg" alt="ProfileLift" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>ProfileLift</h3>
@@ -151,9 +176,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="wellness,habits,tracking">
                     <div class="project-image">
-                        <img src="images/zen-habit.jpeg" alt="Zen Habit" class="project-img">
+                        <img src="images/zen-habit.jpeg" alt="Zen Habit" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>Zen Habit</h3>
@@ -167,9 +192,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="educational,history,heritage">
                     <div class="project-image">
-                        <img src="images/imam-hussain.jpeg" alt="Imam Hussain (as)" class="project-img">
+                        <img src="images/imam-hussain.jpeg" alt="Imam Hussain (as)" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>Imam Hussain (as)</h3>
@@ -183,9 +208,9 @@
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-tags="search-engine,automotive,filters">
                     <div class="project-image">
-                        <img src="images/Screenshot_30-12-2025_121048_wafflesnzxt.github.io.jpeg" alt="Car Search Engine" class="project-img">
+                        <img src="images/Screenshot_30-12-2025_121048_wafflesnzxt.github.io.jpeg" alt="Car Search Engine" class="project-img" loading="lazy" decoding="async" sizes="(max-width: 768px) 100vw, 50vw">
                     </div>
                     <div class="project-info">
                         <h3>Car Search Engine</h3>
@@ -211,9 +236,18 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 Wafi Syed Portfolio. Built with passion and code.</p>
+            <div class="footer-links" aria-label="Quick Links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="about.html">About</a>
+                <a href="hire.html">Hire Me</a>
+            </div>
+            <div style="margin-top:0.75rem;">
+                <button class="icon-btn" data-copy="site" aria-label="Copy site URL"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#copy"></use></svg> Copy Site URL</button>
+            </div>
             <div class="social-links">
-                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank">LinkedIn</a>
+                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#github"></use></svg> GitHub</a>
+                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#linkedin"></use></svg> LinkedIn</a>
             </div>
         </div>
     </footer>

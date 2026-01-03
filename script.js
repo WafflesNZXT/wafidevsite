@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeBuildEstimator();
     renderProjectDetailPage();
     initializeThemeToggle();
+    initializeToasts();
+    initializeCopyActions(); // This line is now moved to the end of the function
+    initializePageTransitions();
 });
 
 // ============================================
@@ -48,7 +51,8 @@ function initializeLoader() {
     const startTime = Date.now();
     let rafId = null;
 
-    // Mark as shown at start to avoid showing again on immediate navigation
+    // Reveal overlay and mark as shown at start to avoid showing again on immediate navigation
+    overlay.classList.add('show');
     try { sessionStorage.setItem(LOADER_KEY, '1'); } catch (_) {}
 
     // Fun cycling messages
@@ -117,6 +121,8 @@ function initializeLoader() {
             progressEl.style.width = '100%';
             percentEl.textContent = '100%';
             setTimeout(() => {
+                // Create intro overlay first to avoid any flicker of the landing view
+                triggerLandingIntro();
                 overlay.classList.add('fade-out');
                 setTimeout(() => { overlay.remove(); }, 500);
                 document.body.style.cursor = '';
@@ -141,12 +147,27 @@ function initializeNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
+    let restoreFocusEl = null;
+    let trapHandler = null;
 
     // Toggle mobile menu
     if (hamburger) {
         hamburger.addEventListener('click', function() {
             navMenu.classList.toggle('active');
             updateHamburgerIcon();
+            const isOpen = navMenu.classList.contains('active');
+            hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (isOpen) {
+                // Focus trap & scroll lock
+                restoreFocusEl = document.activeElement;
+                document.body.classList.add('menu-open');
+                trapFocus(navMenu);
+            } else {
+                // Remove trap and restore focus
+                document.body.classList.remove('menu-open');
+                releaseTrap();
+                if (restoreFocusEl) restoreFocusEl.focus();
+            }
         });
     }
 
@@ -164,8 +185,42 @@ function initializeNavigation() {
         if (!isClickInsideNav && navMenu.classList.contains('active')) {
             navMenu.classList.remove('active');
             updateHamburgerIcon();
+            document.body.classList.remove('menu-open');
+            releaseTrap();
         }
     });
+
+    function focusableSelectors() {
+        return 'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])';
+    }
+    function trapFocus(container) {
+        const focusables = Array.from(container.querySelectorAll(focusableSelectors())).filter(el => !el.hasAttribute('disabled'));
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        first.focus();
+        trapHandler = function(e) {
+            if (e.key !== 'Tab') return;
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+        container.addEventListener('keydown', trapHandler);
+    }
+    function releaseTrap() {
+        if (trapHandler) {
+            navMenu.removeEventListener('keydown', trapHandler);
+            trapHandler = null;
+        }
+    }
 }
 
 function updateHamburgerIcon() {
@@ -210,8 +265,45 @@ function initializeContactForm() {
     const form = document.getElementById('contactForm');
     if (!form) return;
 
+    const errorsEl = document.getElementById('formErrors');
+    const fields = ['name','email','subject','message'].map(id => form.querySelector('#'+id));
+    fields.forEach(f => {
+        if (!f) return;
+        f.addEventListener('input', () => {
+            const valid = f.value.trim() !== '' && (f.id !== 'email' || isValidEmail(f.value.trim()));
+            f.setAttribute('aria-invalid', String(!valid));
+        });
+    });
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        // Honeypot check
+        const hp = form.querySelector('#website');
+        if (hp && hp.value) {
+            showFormMessage('Submission blocked (spam detected).', 'error');
+            return;
+        }
+        // Validate and summarize
+        const name = form.querySelector('#name').value.trim();
+        const email = form.querySelector('#email').value.trim();
+        const subject = form.querySelector('#subject').value.trim();
+        const message = form.querySelector('#message').value.trim();
+        const errs = [];
+        if (!name) errs.push('Name is required');
+        if (!email) errs.push('Email is required'); else if (!isValidEmail(email)) errs.push('Email is invalid');
+        if (!subject) errs.push('Subject is required');
+        if (!message) errs.push('Message is required');
+        if (errs.length) {
+            if (errorsEl) errorsEl.textContent = errs.join(' • ');
+            fields.forEach(f => {
+                const valid = f.value.trim() !== '' && (f.id !== 'email' || isValidEmail(f.value.trim()));
+                f.setAttribute('aria-invalid', String(!valid));
+            });
+            showFormMessage('Please check the highlighted fields.', 'error');
+            return;
+        } else if (errorsEl) {
+            errorsEl.textContent = '';
+        }
         handleFormSubmit(this);
     });
 }
@@ -259,6 +351,7 @@ function handleFormSubmit(form) {
             showFormMessage('Message sent successfully! I\'ll get back to you soon.', 'success');
             form.reset();
             disableFormInputs(form, false);
+            showToast('Message sent successfully', 'success');
         } else {
             return response.json().then(data => {
                 throw new Error(data.errors ? Object.values(data.errors)[0] : 'Error sending message');
@@ -269,6 +362,7 @@ function handleFormSubmit(form) {
         console.error('Error:', error);
         showFormMessage('There was an error sending your message. Please try again.', 'error');
         disableFormInputs(form, false);
+        showToast('Error sending message', 'error');
     });
 }
 
@@ -401,6 +495,19 @@ document.querySelectorAll('.btn').forEach(button => {
         this.appendChild(ripple);
         ripple.addEventListener('animationend', () => ripple.remove());
     });
+});
+
+// Micro-toast on CTA navigation for user feedback
+document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (typeof showToast !== 'function') return;
+    if (href.includes('hire.html')) {
+        showToast('Opening contact…', 'info');
+    } else if (href.includes('projects.html')) {
+        showToast('Exploring projects…', 'info');
+    }
 });
 
 // ============================================
@@ -641,7 +748,11 @@ function initializeBuildEstimator() {
         // Render
         costEl.textContent = `$${cost.toLocaleString()}`;
         timeEl.textContent = `${days} days`;
+        const prevPlan = planEl.textContent;
         planEl.textContent = plan;
+        if (typeof showToast === 'function' && prevPlan && prevPlan !== plan) {
+            showToast(`Recommended plan: ${plan}`, 'success');
+        }
         breakdownEl.innerHTML = `
             <strong>Details:</strong>
             ${pages} pages (${base.includedPages} included, ${extraPages} extra),
@@ -680,6 +791,9 @@ function initializeBuildEstimator() {
             form.reset();
             pagesLabel.textContent = pagesInput.value;
             compute();
+            if (typeof showToast === 'function') {
+                showToast('Estimator reset', 'info');
+            }
         });
     }
 
@@ -1599,7 +1713,7 @@ const PROJECTS_DATA = {
 };
 
 console.log('%c👨‍💻 Welcome to my portfolio!', 'font-size: 20px; color: #16c784; font-weight: bold;');
-console.log('%cLooking to hire? Reach out at: contact@example.com', 'font-size: 14px; color: #667eea;');
+console.log('%cLooking to hire? Reach out at: wafi.syed5@gmail.com', 'font-size: 14px; color: #667eea;');
 
 // ============================================
 // THEME TOGGLE (Light/Dark)
@@ -1623,6 +1737,9 @@ function initializeThemeToggle() {
         safeSet('wafi_theme', next);
         btn.setAttribute('aria-pressed', next === 'dark');
         updateThemeIcon(btn, next);
+        if (typeof showToast === 'function') {
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} theme enabled`, 'success');
+        }
     });
 
     // Respond to OS scheme changes if no user choice stored
@@ -1652,4 +1769,193 @@ function safeGet(key) {
 }
 function safeSet(key, value) {
     try { localStorage.setItem(key, value); } catch {}
+}
+
+// ============================================
+// PAGE TRANSITIONS (Fade In/Out)
+// ============================================
+function initializePageTransitions() {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+    // Enter animation
+    document.body.classList.add('page-enter');
+    setTimeout(() => { document.body.classList.remove('page-enter'); }, 300);
+
+    // Intercept internal links
+    document.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (!a) return;
+        const href = a.getAttribute('href') || '';
+        // Only handle same-site navigation
+        const isInternal = href && !href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('#');
+        const newTab = a.target === '_blank' || e.metaKey || e.ctrlKey;
+        if (!isInternal || newTab) return;
+        e.preventDefault();
+        document.body.classList.add('page-exit');
+        setTimeout(() => { window.location.href = href; }, 220);
+    });
+}
+
+// ============================================
+// LANDING NAME INTRO (typing then fade to landing)
+// ============================================
+function triggerLandingIntro() {
+    const isHome = (window.location.pathname.split('/').pop() || 'index.html') === 'index.html';
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!isHome || reduceMotion) return;
+
+    const name = 'Wafi Syed';
+    const overlay = document.createElement('div');
+    overlay.className = 'name-intro';
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.zIndex = '10000';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.background = 'linear-gradient(135deg, #0b0b18 0%, #121225 100%)';
+    overlay.style.color = '#ffffff';
+    overlay.style.transition = 'opacity 600ms ease';
+    overlay.style.opacity = '1';
+
+    const textEl = document.createElement('div');
+    textEl.className = 'name-text';
+    textEl.style.fontWeight = '800';
+    textEl.style.letterSpacing = '0.02em';
+    textEl.style.fontSize = 'clamp(48px, 12vw, 160px)';
+    textEl.style.textAlign = 'center';
+    textEl.style.lineHeight = '1.1';
+    textEl.style.textShadow = '0 2px 16px rgba(0,0,0,0.6), 0 0 16px rgba(22,199,132,0.25)';
+    textEl.style.webkitTextStroke = '1px rgba(0,0,0,0.25)';
+    textEl.textContent = '';
+    overlay.appendChild(textEl);
+
+    document.body.appendChild(overlay);
+
+    let i = 0;
+    const interval = setInterval(() => {
+        i += 1;
+        textEl.textContent = name.slice(0, i);
+        if (i >= name.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+                setTimeout(() => { overlay.remove(); }, 650);
+            }, 1200);
+        }
+    }, 120);
+}
+
+function getSiteOwnerName() {
+    // Try JSON-LD Person schema first
+    const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+    for (const s of scripts) {
+        try {
+            const data = JSON.parse(s.textContent || '{}');
+            const arr = Array.isArray(data) ? data : [data];
+            for (const obj of arr) {
+                if ((obj['@type'] === 'Person' || (obj['@graph'] && obj['@graph'].some(g => g['@type'] === 'Person'))) && obj.name) {
+                    return obj.name;
+                }
+                if (obj['@graph']) {
+                    const person = obj['@graph'].find(g => g['@type'] === 'Person' && g.name);
+                    if (person) return person.name;
+                }
+            }
+        } catch (_) {}
+    }
+    // Fallback to domain-based guess
+    const host = (location.hostname || '').toLowerCase();
+    if (host.includes('wafisyed')) return 'Wafi Syed';
+    // Final fallback
+    return document.title || 'Welcome';
+}
+
+// ============================================
+// MICRO TOASTS
+// ============================================
+let _toastContainer = null;
+function initializeToasts() {
+    _toastContainer = document.querySelector('.toast-container');
+    if (!_toastContainer) {
+        _toastContainer = document.createElement('div');
+        _toastContainer.className = 'toast-container';
+        _toastContainer.setAttribute('aria-live', 'polite');
+        _toastContainer.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(_toastContainer);
+    }
+}
+
+function showToast(message, type = 'info', duration = 3000) {
+    if (!_toastContainer) initializeToasts();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'status');
+    const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : '🔔';
+    toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" aria-label="Close">×</button>
+    `;
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => toast.remove());
+    _toastContainer.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, duration);
+}
+
+// ============================================
+// COPY TO CLIPBOARD (Phone)
+// ============================================
+function initializeCopyActions() {
+    const elements = document.querySelectorAll('[data-copy], .copy-btn');
+    elements.forEach(el => {
+        el.addEventListener('click', async () => {
+            let value = el.getAttribute('data-copy');
+            if (!value && el.classList.contains('copy-btn')) {
+                value = el.getAttribute('data-number') || (el.closest('p')?.querySelector('.phone-link')?.getAttribute('data-number'));
+            }
+            if (!value) return;
+            if (value === 'site') value = location.href;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(value);
+                } else {
+                    const temp = document.createElement('input');
+                    temp.value = value;
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand('copy');
+                    temp.remove();
+                }
+                showToast('Copied to clipboard', 'success');
+            } catch (_) {
+                showToast('Unable to copy', 'error');
+            }
+        });
+    });
+}
+
+function initializeProjectFilters() {
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.project-card');
+    if (!buttons.length || !cards.length) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.getAttribute('data-filter');
+            buttons.forEach(b => b.classList.remove('active'));
+            buttons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+            btn.classList.add('active');
+            cards.forEach(card => {
+                const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+                const matches = filter === 'all' || tags.includes(filter);
+                if (matches) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        });
+    });
 }

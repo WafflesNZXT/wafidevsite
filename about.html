@@ -9,6 +9,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+        <!-- JSON-LD Breadcrumbs -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://wafisyed.dev/"},
+                {"@type": "ListItem", "position": 2, "name": "About", "item": "https://wafisyed.dev/about.html"}
+            ]
+        }
+        </script>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -243,9 +254,18 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 Wafi Syed Portfolio. Built with passion and code.</p>
+            <div class="footer-links" aria-label="Quick Links">
+                <a href="index.html">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="about.html">About</a>
+                <a href="hire.html">Hire Me</a>
+            </div>
+            <div style="margin-top:0.75rem;">
+                <button class="icon-btn" data-copy="site" aria-label="Copy site URL"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#copy"></use></svg> Copy Site URL</button>
+            </div>
             <div class="social-links">
-                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank">LinkedIn</a>
+                <a href="https://github.com/WafflesNZXT" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#github"></use></svg> GitHub</a>
+                <a href="https://www.linkedin.com/in/wafisyed/" class="social-link" target="_blank"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#linkedin"></use></svg> LinkedIn</a>
             </div>
         </div>
     </footer>
