@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio - Web Development Projects</title>
+    <!-- SEO & Sharing -->
+    <meta name="description" content="Wafi Syed — Front‑end & UX developer crafting fast, accessible, and elegant web experiences. Explore featured work, skills, and how I build.">
+    <link rel="canonical" href="https://wafisyed.dev/">
+    <meta property="og:title" content="Wafi Syed — Web Developer">
+    <meta property="og:description" content="Crafting stunning, responsive websites that engage and convert.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wafisyed.dev/">
+    <meta property="og:image" content="https://wafisyed.dev/images/inobex.jpeg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wafi Syed — Web Developer">
+    <meta name="twitter:description" content="Crafting stunning, responsive websites that engage and convert.">
+    <meta name="twitter:image" content="https://wafisyed.dev/images/inobex.jpeg">
     <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +23,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Skip to main content link for keyboard users -->
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <!-- Loading Overlay -->
     <div id="loader" class="loader-overlay" aria-live="polite" role="status">
         <div class="loader-box">
@@ -39,6 +53,9 @@
                 <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
                 <li class="nav-item"><a href="hire.html" class="nav-link nav-link-btn">Hire Me</a></li>
             </ul>
+            <button class="theme-toggle" type="button" aria-label="Toggle color theme" aria-pressed="false" title="Toggle theme">
+                <span class="theme-icon" aria-hidden="true">🌙</span>
+            </button>
             <div class="hamburger">
                 <span></span>
                 <span></span>
@@ -48,7 +65,7 @@
     </nav>
 
     <div class="abstract-bg"></div>
-
+    <main id="main-content" tabindex="-1">
     <section class="hero">
         <div class="hero-content">
             <h1 class="hero-title">Web Development <span class="gradient-text">Expertise</span></h1>
@@ -87,22 +104,22 @@
     <section class="featured" id="featured">
         <div class="container">
             <h2>Featured Works</h2>
-            <div class="carousel-container">
-                <div class="featured-carousel">
-                    <div class="featured-card">
-                        <img src="images/inobex.jpeg" alt="INOBEX" class="card-image">
+            <div class="carousel-container" role="region" aria-label="Featured projects" aria-live="polite">
+                <div class="featured-carousel" aria-roledescription="carousel">
+                    <div class="featured-card" role="group" aria-label="Slide 1 of 3">
+                        <img src="images/inobex.jpeg" alt="INOBEX project preview" class="card-image" loading="lazy" decoding="async">
                         <h3>Inobex</h3>
                         <p>Enterprise solutions and business intelligence platform</p>
                         <a href="projects.html" class="btn btn-secondary">View Project</a>
                     </div>
-                    <div class="featured-card">
-                        <img src="images/haider-cricket.jpeg" alt="Haider Cricket" class="card-image">
+                    <div class="featured-card" role="group" aria-label="Slide 2 of 3">
+                        <img src="images/haider-cricket.jpeg" alt="Haider Cricket project preview" class="card-image" loading="lazy" decoding="async">
                         <h3>Haider Cricket</h3>
                         <p>Cricket statistics and player analytics platform</p>
                         <a href="projects.html" class="btn btn-secondary">View Project</a>
                     </div>
-                    <div class="featured-card">
-                        <img src="images/bassl.jpeg" alt="BASSL" class="card-image">
+                    <div class="featured-card" role="group" aria-label="Slide 3 of 3">
+                        <img src="images/bassl.jpeg" alt="BASSL project preview" class="card-image" loading="lazy" decoding="async">
                         <h3>BASSL</h3>
                         <p>Advanced analytics and reporting system</p>
                         <a href="projects.html" class="btn btn-secondary">View Project</a>
@@ -115,9 +132,9 @@
                     <span>→</span>
                 </button>
                 <div class="carousel-indicators">
-                    <button class="indicator active" data-index="0"></button>
-                    <button class="indicator" data-index="1"></button>
-                    <button class="indicator" data-index="2"></button>
+                    <button class="indicator active" data-index="0" aria-label="Go to slide 1" aria-current="true"></button>
+                    <button class="indicator" data-index="1" aria-label="Go to slide 2"></button>
+                    <button class="indicator" data-index="2" aria-label="Go to slide 3"></button>
                 </div>
             </div>
         </div>
@@ -204,111 +221,111 @@
             </div>
             <div class="faq-grid">
                 <div class="faq-item" data-topics="timeline, schedule, delivery time, project timeline">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-1-answer">
                         <span>What's your typical project timeline?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-1-answer" role="region" aria-label="Project timeline answer">
                         <p>Timeline depends on project scope, but typically: Small websites (5-7 days), Medium projects (2-3 weeks), Large projects (4-8 weeks). I always provide detailed estimates upfront.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="maintenance, support, updates, upkeep, monitoring">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-2-answer">
                         <span>Do you offer ongoing maintenance?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-2-answer" role="region" aria-label="Maintenance answer">
                         <p>Yes! I offer maintenance packages to keep your site secure, updated, and performing optimally. This includes security updates, backups, and performance monitoring.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="existing website, redesign, rebuild, improve, updates">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-3-answer">
                         <span>Can you work with my existing website?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-3-answer" role="region" aria-label="Existing website answer">
                         <p>Absolutely! I can redesign, rebuild, or improve existing websites. Whether you need updates, better performance, or a complete overhaul, I can help.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="responsive, mobile, tablet, devices, responsiveness">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-4-answer">
                         <span>What about mobile responsiveness?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-4-answer" role="region" aria-label="Mobile responsiveness answer">
                         <p>Mobile responsiveness is built into every project. All sites are optimized for phones, tablets, and desktops to ensure the best user experience on any device.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="revisions, feedback, changes, iterations">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-5-answer">
                         <span>How do you handle revisions?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-5-answer" role="region" aria-label="Revisions answer">
                         <p>Revisions are built into my process. You'll have opportunities to provide feedback at key milestones, and I'll refine the work based on your input.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="pricing, cost, budget, project cost, fees">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-6-answer">
                         <span>What's the cost structure?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-6-answer" role="region" aria-label="Pricing answer">
                         <p>Pricing is project-based and depends on scope, complexity, and timeline. I provide custom quotes after our initial consultation. Let's discuss your needs!</p>
                     </div>
                 </div>
                 <!-- Additional FAQs for pagination -->
                 <div class="faq-item" data-topics="hosting, domain, ssl, deployment, servers">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-7-answer">
                         <span>Do you handle hosting and domain setup?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-7-answer" role="region" aria-label="Hosting answer">
                         <p>Yes, I can help choose reliable hosting, configure servers, set up domains and SSL certificates, and deploy with CI/CD for seamless updates.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="cms, wordpress, headless, contentful, sanity">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-8-answer">
                         <span>Can you integrate CMS like WordPress or headless?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-8-answer" role="region" aria-label="CMS answer">
                         <p>I don’t use WordPress or drag‑and‑drop web builders. I build custom‑coded solutions tailored to your needs. If you require content management, I can implement a lightweight custom CMS or integrate a headless content service (e.g., Contentful, Sanity) via code—keeping performance, security, and maintainability front and center.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="seo, performance, speed, optimization, discoverability">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-9-answer">
                         <span>What about SEO and performance?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-9-answer" role="region" aria-label="SEO answer">
                         <p>I implement on‑page SEO, semantic HTML, structured data, image optimization, caching, and monitoring to keep pages fast and discoverable.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="analytics, tracking, ga4, conversions, events">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-10-answer">
                         <span>Do you provide analytics and tracking?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-10-answer" role="region" aria-label="Analytics answer">
                         <p>Yes, from privacy‑friendly analytics to full GA4 setups, plus event tracking for conversions and A/B testing hooks if needed.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="accessibility, a11y, wcag, aria, keyboard navigation">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-11-answer">
                         <span>How do you approach accessibility (A11y)?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-11-answer" role="region" aria-label="Accessibility answer">
                         <p>I follow WCAG guidelines: proper contrast, keyboard navigation, ARIA landmarks, semantic markup, and audit tools to validate compliance.</p>
                     </div>
                 </div>
                 <div class="faq-item" data-topics="i18n, multilingual, translations, locales, language toggle">
-                    <button class="faq-question">
+                    <button class="faq-question" aria-expanded="false" aria-controls="faq-12-answer">
                         <span>Do you support multi‑language sites?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-answer">
+                    <div class="faq-answer" id="faq-12-answer" role="region" aria-label="Multilingual answer">
                         <p>Yes, I can implement internationalization (i18n), language toggles, locale‑aware routing, and content workflows for translations.</p>
                     </div>
                 </div>
@@ -325,6 +342,9 @@
         </div>
     </section>
 
+    </main>
+    <!-- Sticky mobile CTA -->
+    <a href="hire.html" class="mobile-cta" aria-label="Start your project">Get in Touch</a>
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 Wafi Syed Portfolio. Built with passion and code.</p>

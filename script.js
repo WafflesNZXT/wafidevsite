@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeMicroInteractions();
     initializeBuildEstimator();
     renderProjectDetailPage();
+    initializeThemeToggle();
 });
 
 // ============================================
@@ -349,6 +350,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 behavior: 'smooth',
                 block: 'start'
             });
+            // Move keyboard focus when skipping to main content
+            if (href === '#main-content') {
+                if (!target.hasAttribute('tabindex')) {
+                    target.setAttribute('tabindex', '-1');
+                }
+                target.focus({ preventScroll: true });
+            }
         }
     });
 });
@@ -775,7 +783,8 @@ function initializeTypingAnimation() {
 
 function initializeCursorEffects() {
     // Skip on touch devices to avoid overhead and odd UX
-    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if ((navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || reduceMotion) {
         return;
     }
     // Create cursor elements
@@ -881,11 +890,16 @@ function initializeFAQ() {
             faqItems.forEach(otherItem => {
                 if (otherItem !== item && otherItem.classList.contains('active')) {
                     otherItem.classList.remove('active');
+                    const otherBtn = otherItem.querySelector('.faq-question');
+                    if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
                 }
             });
             
             // Toggle current item
-            item.classList.toggle('active');
+            const nowActive = !item.classList.contains('active');
+            item.classList.toggle('active', nowActive);
+            // Reflect expanded state for accessibility
+            question.setAttribute('aria-expanded', nowActive ? 'true' : 'false');
         });
     });
 }
@@ -1055,6 +1069,16 @@ function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, 
     let autoPlayTimer = null;
     const totalSlides = indicators.length;
 
+    // Live region for screen readers
+    let statusEl = carousel.parentElement.querySelector('.carousel-status');
+    if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.className = 'sr-only carousel-status';
+        statusEl.setAttribute('aria-live', 'polite');
+        statusEl.setAttribute('aria-atomic', 'true');
+        carousel.parentElement.appendChild(statusEl);
+    }
+
     function updateCarousel() {
         // Update carousel position - each slide is exactly 100% width
         carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -1063,7 +1087,11 @@ function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, 
         // Update indicators
         indicators.forEach((indicator, index) => {
             indicator.classList.toggle('active', index === currentIndex);
+            indicator.setAttribute('aria-current', index === currentIndex ? 'true' : 'false');
         });
+
+        // Announce slide change
+        statusEl.textContent = `Slide ${currentIndex + 1} of ${totalSlides}`;
     }
 
     function nextSlide() {
@@ -1107,6 +1135,9 @@ function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, 
 
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => goToSlide(index));
+        if (!indicator.getAttribute('aria-label')) {
+            indicator.setAttribute('aria-label', `Go to slide ${index + 1}`);
+        }
     });
 
     // Pause on hover, resume on leave
@@ -1569,3 +1600,56 @@ const PROJECTS_DATA = {
 
 console.log('%c👨‍💻 Welcome to my portfolio!', 'font-size: 20px; color: #16c784; font-weight: bold;');
 console.log('%cLooking to hire? Reach out at: contact@example.com', 'font-size: 14px; color: #667eea;');
+
+// ============================================
+// THEME TOGGLE (Light/Dark)
+// ============================================
+function initializeThemeToggle() {
+    const btn = document.querySelector('.theme-toggle');
+    if (!btn) return;
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const saved = safeGet('wafi_theme');
+    const initial = saved || (prefersDark ? 'dark' : 'light');
+    applyTheme(initial);
+
+    btn.setAttribute('aria-pressed', initial === 'dark');
+    updateThemeIcon(btn, initial);
+
+    btn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || initial;
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        safeSet('wafi_theme', next);
+        btn.setAttribute('aria-pressed', next === 'dark');
+        updateThemeIcon(btn, next);
+    });
+
+    // Respond to OS scheme changes if no user choice stored
+    if (!saved && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        mq.addEventListener('change', (e) => {
+            const next = e.matches ? 'dark' : 'light';
+            applyTheme(next);
+            btn.setAttribute('aria-pressed', next === 'dark');
+            updateThemeIcon(btn, next);
+        });
+    }
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+function updateThemeIcon(btn, theme) {
+    const icon = btn.querySelector('.theme-icon');
+    if (!icon) return;
+    icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+}
+
+function safeGet(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSet(key, value) {
+    try { localStorage.setItem(key, value); } catch {}
+}

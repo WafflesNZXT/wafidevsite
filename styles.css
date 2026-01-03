@@ -36,6 +36,27 @@
     --accent-blue-muted: rgba(14, 165, 233, 0.05);
 }
 
+    /* Light theme variables */
+    :root[data-theme="light"] {
+        --primary-dark: #ffffff;
+        --primary-light: #f7f7f7;
+        --primary-card: #ffffff;
+        --primary-accent: #0ea5e9;
+    
+        --secondary-accent: #475569;
+        --secondary-hover: #111827;
+    
+        --text-primary: #0f172a;
+        --text-secondary: #334155;
+        --text-muted: #64748b;
+        --border-color: #e5e7eb;
+        --border-light: #d1d5db;
+    
+        --accent-blue: #0ea5e9;
+        --accent-blue-light: rgba(14, 165, 233, 0.12);
+        --accent-blue-muted: rgba(14, 165, 233, 0.08);
+    }
+
 /* ============================================
    TYPOGRAPHY & GLOBAL STYLES
    ============================================ */
@@ -111,6 +132,61 @@ h3 {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-blue);
+}
+
+/* ============================================
+   ACCESSIBILITY: Focus & Skip Link
+   ============================================ */
+/* Visible focus for keyboard users */
+a:focus-visible,
+button:focus-visible,
+.nav-link:focus-visible,
+.btn:focus-visible,
+.carousel-arrow:focus-visible,
+.indicator:focus-visible,
+.faq-question:focus-visible,
+.hamburger:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* Skip to content link */
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 10001;
+    background: var(--accent-blue);
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transform: translateY(-120%);
+    transition: transform 0.2s ease;
+}
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* Honor reduced motion: limit heavy effects */
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    .ambient-overlay { animation: none !important; }
+    .light-follow { display: none !important; }
+}
+
+/* Visually hidden utility for live regions */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }
 
 /* ============================================
@@ -218,6 +294,55 @@ h3 {
     z-index: 100;
     padding: 1rem 0;
 }
+
+/* Light Theme Overrides: Navbar & Links */
+:root[data-theme="light"] .navbar {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+:root[data-theme="light"] .nav-link {
+    color: var(--text-primary);
+}
+:root[data-theme="light"] .nav-link:hover,
+:root[data-theme="light"] .nav-link.active {
+    color: var(--accent-blue);
+}
+:root[data-theme="light"] .nav-link::after {
+    background: var(--accent-blue);
+}
+:root[data-theme="light"] .nav-link-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+:root[data-theme="light"] .nav-link-btn:hover {
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.08);
+}
+:root[data-theme="light"] .logo-text {
+    color: var(--text-primary);
+}
+
+    /* Theme toggle button */
+    .theme-toggle {
+        background: rgba(14,165,233,0.08);
+        border: 1px solid var(--border-light);
+        color: var(--text-primary);
+        padding: 0.45rem 0.7rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 1rem;
+    }
+    .theme-toggle:hover {
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+        color: #fff;
+    }
+    .theme-icon { display: inline-block; }
 
 .nav-container {
     max-width: 1200px;
@@ -2338,6 +2463,21 @@ section {
     transition: all 0.4s ease;
 }
 
+/* Light Theme Overrides: CTA banners */
+:root[data-theme="light"] .cta .container {
+    background: linear-gradient(135deg,
+        rgba(14, 165, 233, 0.08) 0%,
+        rgba(14, 165, 233, 0.06) 25%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(14, 165, 233, 0.08) 75%,
+        rgba(14, 165, 233, 0.06) 100%);
+    box-shadow: 0 6px 24px rgba(14, 165, 233, 0.12);
+}
+:root[data-theme="light"] .cta .container:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 10px 36px rgba(14, 165, 233, 0.18);
+}
+
 .cta .container:hover {
     border-color: var(--accent-blue);
     box-shadow: 0 12px 48px rgba(14, 165, 233, 0.15);
@@ -2351,6 +2491,15 @@ section {
 .cta.cta-secondary .container {
     background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.05) 30%, rgba(21, 21, 21, 0.5) 50%, rgba(14, 165, 233, 0.08) 70%, rgba(14, 165, 233, 0.12) 100%);
     padding: 4rem 3rem;
+}
+
+:root[data-theme="light"] .cta.cta-secondary .container {
+    background: linear-gradient(135deg,
+        rgba(14, 165, 233, 0.06) 0%,
+        rgba(14, 165, 233, 0.04) 30%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(14, 165, 233, 0.06) 70%,
+        rgba(14, 165, 233, 0.08) 100%);
 }
 
 .cta.cta-secondary h2 {
@@ -2398,6 +2547,23 @@ section {
     transform: translateY(-2px);
     opacity: 0.7;
 }
+
+    /* Sticky Mobile CTA */
+    .mobile-cta {
+        position: fixed;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent-blue);
+        color: #fff;
+        padding: 0.8rem 1.2rem;
+        border-radius: 999px;
+        box-shadow: 0 8px 20px rgba(14,165,233,0.25);
+        text-decoration: none;
+        z-index: 1200;
+        display: none; /* visible only on mobile */
+    }
+    .mobile-cta:hover { opacity: 0.95; }
 
 /* ============================================
    RESPONSIVE DESIGN
@@ -2582,6 +2748,9 @@ section {
     .social-links {
         gap: 1.5rem;
     }
+
+        .mobile-cta { display: inline-block; }
+        .theme-toggle { margin-left: 0.75rem; }
 }
 
 @media (max-width: 480px) {
@@ -2774,6 +2943,8 @@ section {
     .indicator.active {
         width: 24px;
     }
+
+    .mobile-cta { bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
 
 /* ============================================
@@ -2868,6 +3039,15 @@ section {
 .rotation-indicator .rotation-tip {
     font-size: 0.9rem;
     color: var(--text-secondary);
+}
+
+/* Light Theme: make rotation indicator visible */
+:root[data-theme="light"] .rotation-indicator {
+    color: var(--text-primary);
+    opacity: 0.9;
+}
+:root[data-theme="light"] .rotation-indicator svg path {
+    stroke: var(--text-primary) !important;
 }
 
 /* Sticky variant to keep the cue always visible while approaching contact */
