@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeThemeToggle();
     initializeToasts();
     initializeCopyActions(); // This line is now moved to the end of the function
+    applyPrettyUrls();
     initializePageTransitions();
 });
 
@@ -243,7 +244,20 @@ function updateHamburgerIcon() {
 // ============================================
 
 function updateActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const pathPart = window.location.pathname.split('/').pop();
+    let currentPage = pathPart || 'index.html';
+
+    // Map pretty paths back to underlying files for nav highlighting
+    const prettyMap = {
+        'home': 'index.html',
+        'projects': 'projects.html',
+        'project': 'project.html',
+        'about': 'about.html',
+        'hire': 'hire.html'
+    };
+    if (!currentPage.includes('.') && prettyMap[currentPage]) {
+        currentPage = prettyMap[currentPage];
+    }
     const navLinks = document.querySelectorAll('.nav-link');
 
     navLinks.forEach(link => {
@@ -255,6 +269,45 @@ function updateActiveNavLink() {
             link.classList.add('active');
         }
     });
+}
+
+// Hide .html extensions in the address bar for cleaner URLs
+function applyPrettyUrls() {
+    const path = window.location.pathname;
+    const file = path.split('/').pop() || 'index.html';
+    const search = window.location.search;
+    const hash = window.location.hash;
+    let prettyPath = null;
+
+    switch (file) {
+        case 'index.html':
+        case '':
+            prettyPath = '/home';
+            break;
+        case 'projects.html':
+            prettyPath = '/projects';
+            break;
+        case 'project.html': {
+            const params = new URLSearchParams(search);
+            const id = params.get('id');
+            prettyPath = id ? `/project/${id}` : '/project';
+            break;
+        }
+        case 'about.html':
+            prettyPath = '/about';
+            break;
+        case 'hire.html':
+            prettyPath = '/hire';
+            break;
+        default:
+            return; // leave unknown paths untouched
+    }
+
+    if (!prettyPath) return;
+    if (path === prettyPath) return; // already pretty
+
+    const newUrl = `${prettyPath}${hash || ''}`;
+    history.replaceState({}, '', newUrl);
 }
 
 // ============================================
@@ -1800,7 +1853,9 @@ function initializePageTransitions() {
 // LANDING NAME INTRO (typing then fade to landing)
 // ============================================
 function triggerLandingIntro() {
-    const isHome = (window.location.pathname.split('/').pop() || 'index.html') === 'index.html';
+    const path = window.location.pathname.replace(/\/+$/, '');
+    const last = path.split('/').pop() || 'index.html';
+    const isHome = last === 'index.html' || last === '' || last === 'home';
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!isHome || reduceMotion) return;
 
@@ -1936,26 +1991,4 @@ function initializeCopyActions() {
     });
 }
 
-function initializeProjectFilters() {
-    const buttons = document.querySelectorAll('.filter-btn');
-    const cards = document.querySelectorAll('.project-card');
-    if (!buttons.length || !cards.length) return;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filter = btn.getAttribute('data-filter');
-            buttons.forEach(b => b.classList.remove('active'));
-            buttons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-            btn.classList.add('active');
-            cards.forEach(card => {
-                const tags = (card.getAttribute('data-tags') || '').toLowerCase();
-                const matches = filter === 'all' || tags.includes(filter);
-                if (matches) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        });
-    });
-}
+// Project filters removed; feature no longer used.
