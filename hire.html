@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://formspree.io https://api.formspree.io http://127.0.0.1:5500 http://localhost:5500; img-src 'self' data: https://wafisyed.dev; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self' https://formspree.io https://api.formspree.io; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.emailjs.com http://127.0.0.1:5500 http://localhost:5500; img-src 'self' data: https://wafisyed.dev; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
     <title>Hire Me - Portfolio</title>
     <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
     <link rel="stylesheet" href="styles.css">
@@ -251,6 +251,7 @@
                         <li>✓ Basic Security</li>
                         <li class="optional-add">Optional: $25/month Maintenance</li>
                     </ul>
+                    <button type="button" class="btn btn-primary select-plan-btn" data-plan="Basic" aria-label="Choose Basic plan">Choose Basic</button>
                 </div>
                 <div class="pricing-card featured">
                     <div class="badge">Most Popular</div>
@@ -272,6 +273,7 @@
                         <li>✓ Performance Optimization</li>
                         <li class="optional-add">Optional: $50/month Maintenance</li>
                     </ul>
+                    <button type="button" class="btn btn-primary select-plan-btn" data-plan="Advanced" aria-label="Choose Advanced plan">Choose Advanced</button>
                 </div>
                 <div class="pricing-card">
                         <div class="tier-icon"><svg class="icon" aria-hidden="true"><use href="images/icon-sprite.svg#trophy"></use></svg></div>
@@ -292,6 +294,7 @@
                         <li>✓ Advanced Security</li>
                         <li class="optional-add">Optional: $75/month Maintenance</li>
                     </ul>
+                    <button type="button" class="btn btn-primary select-plan-btn" data-plan="Pro" aria-label="Choose Pro plan">Choose Pro</button>
                 </div>
             </div>
         </div>
@@ -315,7 +318,14 @@
         <div class="container">
             <h2>Get In Touch</h2>
             <div class="contact-wrapper">
-                <form class="contact-form" id="contactForm" action="https://formspree.io/f/mnjqkboj" method="post" novalidate>
+                            <form class="contact-form" id="contactForm" action="" method="post" novalidate 
+                                data-emailjs-public-key="Pqse8h-LaxFgSW1SH" 
+                                data-emailjs-service-id="service_iwxl6w6" 
+                                data-emailjs-template-id="template_s1uilom" 
+                                data-emailjs-to-email="wafisyed.dev@gmail.com"
+                                data-emailjs-confirm-template-id=""
+                                data-emailjs-template-to-dynamic="true">
+                    <div class="selected-plan-notice" id="selectedPlanNotice" aria-live="polite" style="display:none"></div>
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" id="name" name="name" placeholder="John Doe" required>
@@ -332,6 +342,7 @@
                         <label for="message">Message</label>
                         <textarea id="message" name="message" placeholder="Tell me about your project and which plan you think fits best (e.g., Advanced)." rows="5" required></textarea>
                     </div>
+                    <input type="hidden" id="selectedPlan" name="selectedPlan" value="">
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                     <div class="form-message" id="formMessage"></div>
                     <div class="form-errors" id="formErrors" role="alert" aria-live="polite"></div>

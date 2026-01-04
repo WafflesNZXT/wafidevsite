@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeLoader();
     initializeNavigation();
     initializeContactForm();
+    // EmailJS SDK not used; REST calls are handled in handleFormSubmit
     observeAnimations();
     updateActiveNavLink();
     initializeCounterAnimation();
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTiltedStacks();
     initializeMicroInteractions();
     initializeBuildEstimator();
+    initializePlanSelection();
     renderProjectDetailPage();
     initializeThemeToggle();
     initializeToasts();
@@ -422,6 +424,20 @@ function handleFormSubmit(form) {
     const email = form.querySelector('#email').value.trim();
     const subject = form.querySelector('#subject').value.trim();
     const message = form.querySelector('#message').value.trim();
+    const selectedPlan = (form.querySelector('#selectedPlan')?.value || '').trim();
+    const subjectFinal = selectedPlan ? `[Plan: ${selectedPlan}] ${subject || 'Inquiry'}` : (subject || 'Inquiry');
+    const toEmail = (form.dataset.emailjsToEmail || '').trim();
+
+    // Prefer EmailJS if configured
+    const ds = form.dataset || {};
+    const canUseEmailJS = !!(ds.emailjsPublicKey && ds.emailjsServiceId && ds.emailjsTemplateId);
+    if (!canUseEmailJS) {
+        const missing = [];
+        if (!ds.emailjsPublicKey) missing.push('public key');
+        if (!ds.emailjsServiceId) missing.push('service id');
+        if (!ds.emailjsTemplateId) missing.push('template id');
+        console.warn('EmailJS not configured:', missing.join(', '));
+    }
 
     // Validate form
     if (!name || !email || !subject || !message) {
@@ -438,38 +454,109 @@ function handleFormSubmit(form) {
     // Disable form inputs
     disableFormInputs(form, true);
     
-    // Submit to Formspree as JSON
-    fetch(form.action, {
-        method: 'POST',
-        body: JSON.stringify({
-            name: name,
-            email: email,
-            subject: subject,
-            message: message
-        }),
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => {
-        if (response.ok) {
+    if (canUseEmailJS) {
+        const body = {
+            service_id: ds.emailjsServiceId,
+            template_id: ds.emailjsTemplateId,
+            user_id: ds.emailjsPublicKey,
+            template_params: {
+                // Standard names
+                from_name: name,
+                reply_to: email,
+                subject: subjectFinal,
+                message: message,
+                selected_plan: selectedPlan,
+                to_email: toEmail,
+                // Common alternate names some templates use
+                name: name,
+                email: email,
+                plan: selectedPlan,
+                form_message: message,
+                to_name: 'Wafi Syed',
+                // Branding and site variables
+                brand_name: 'Wafi Syed Portfolio',
+                brand_primary: '#0EA5E9',
+                brand_text: '#111827',
+                brand_border: '#E5E7EB',
+                site_url: 'https://wafisyed.dev',
+                logo_url: 'https://wafisyed.dev/images/favicon.svg'
+            }
+        };
+
+        fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('EmailJS send failed');
             showFormMessage('Message sent successfully! I\'ll get back to you soon.', 'success');
             form.reset();
             disableFormInputs(form, false);
             showToast('Message sent successfully', 'success');
-        } else {
-            return response.json().then(data => {
-                throw new Error(data.errors ? Object.values(data.errors)[0] : 'Error sending message');
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showFormMessage('There was an error sending your message. Please try again.', 'error');
-        disableFormInputs(form, false);
-        showToast('Error sending message', 'error');
-    });
+
+            // Optional: send confirmation to client
+            const confirmTemplateExplicit = ds.emailjsConfirmTemplateId; // dedicated template id
+            const canReusePrimary = ds.emailjsTemplateToDynamic === 'true';
+            const confirmTemplate = confirmTemplateExplicit || (canReusePrimary ? ds.emailjsTemplateId : '');
+            if (confirmTemplate && email && toEmail && email !== toEmail) {
+                const confirmBody = {
+                    service_id: ds.emailjsServiceId,
+                    template_id: confirmTemplate,
+                    user_id: ds.emailjsPublicKey,
+                    template_params: {
+                        to_email: email,
+                        to_name: name || 'there',
+                        subject: `We received your message${selectedPlan ? ' — ' + selectedPlan : ''}`,
+                        client_name: name,
+                        client_email: email,
+                        selected_plan: selectedPlan,
+                        message: message,
+                        reply_to: toEmail, // ensure replies come to your inbox
+                        // Ensure templates using common aliases render correctly
+                        from_name: name,
+                        name: name,
+                        email: email,
+                        form_message: message,
+                        plan: selectedPlan,
+                        // Branding and site variables
+                        brand_name: 'Wafi Syed',
+                        brand_primary: '#0EA5E9',
+                        brand_text: '#111827',
+                        brand_border: '#E5E7EB',
+                        site_url: 'https://wafisyed.dev',
+                        logo_url: 'https://wafisyed.dev/images/favicon.svg'
+                    }
+                };
+                fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(confirmBody)
+                })
+                .then(r => {
+                    if (!r.ok) throw new Error('EmailJS confirm send failed');
+                    showToast('Confirmation email sent to client', 'success');
+                })
+                .catch(err => {
+                    console.warn('Confirmation email failed:', err);
+                });
+            } else {
+                console.info('Skipping client confirmation (no template, non-dynamic primary, or same recipient).');
+            }
+        })
+        .catch(error => {
+            console.error('EmailJS error:', error);
+            showFormMessage('There was an error sending your message. Please try again.', 'error');
+            disableFormInputs(form, false);
+            showToast('Error sending message', 'error');
+        });
+        return;
+    }
+
+    // No fallback: inform user that email is not configured
+    showFormMessage('Unable to send: email service not configured. Please try again later.', 'error');
+    disableFormInputs(form, false);
+    return;
 }
 
 function showFormMessage(message, type) {
@@ -499,6 +586,57 @@ function disableFormInputs(form, disabled) {
         }
     });
 }
+
+// ============================================
+// PLAN SELECTION
+// ============================================
+function initializePlanSelection() {
+    const cards = Array.from(document.querySelectorAll('.pricing-card'));
+    const buttons = Array.from(document.querySelectorAll('.select-plan-btn'));
+    if (!buttons.length) return;
+
+    const contactSection = document.getElementById('contact');
+    const subjectInput = document.getElementById('subject');
+    const messageInput = document.getElementById('message');
+    const selectedInput = document.getElementById('selectedPlan');
+    const noticeEl = document.getElementById('selectedPlanNotice');
+
+    function clearSelected() {
+        cards.forEach(c => c.classList.remove('selected'));
+    }
+
+    function setNotice(plan) {
+        if (!noticeEl) return;
+        noticeEl.textContent = `Selected Plan: ${plan}`;
+        noticeEl.style.display = 'block';
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const plan = btn.getAttribute('data-plan') || '';
+            clearSelected();
+            const card = btn.closest('.pricing-card');
+            if (card) card.classList.add('selected');
+
+            if (selectedInput) selectedInput.value = plan;
+            if (subjectInput && !subjectInput.value) subjectInput.value = `Plan Inquiry: ${plan}`;
+            if (messageInput && !messageInput.value) {
+                messageInput.value = `Hi Wafi, I'd like to proceed with the ${plan} plan. Could you share next steps and payment details?`;
+            }
+
+            setNotice(plan);
+            showToast(`${plan} plan selected`, 'success');
+            if (contactSection) {
+                contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            const nameInput = document.getElementById('name');
+            if (nameInput) nameInput.focus({ preventScroll: true });
+        });
+    });
+}
+
+// ============================================
+// (EmailJS SDK not required; REST is used directly in handleFormSubmit)
 
 // ============================================
 // INTERSECTION OBSERVER FOR ANIMATIONS
