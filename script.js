@@ -430,26 +430,6 @@ function handleFormSubmit(form) {
     const logoUrl = (form.dataset.emailjsLogoUrl || 'https://wafisyed.dev/images/favicon-dark.svg').trim();
     const logoUrlPng = (form.dataset.emailjsLogoUrlPng || '').trim();
 
-    // Build HTML content blocks for emails (render with triple braces in template)
-    const escapeHtml = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const msgHtml = escapeHtml(message).replace(/\n/g, '<br>');
-    const adminContentHtml = `
-        <div style="font-size:14px;line-height:1.6;">
-            <strong>Client Name:</strong> ${escapeHtml(name)}<br>
-            <strong>Client Email:</strong> ${escapeHtml(email)}<br>
-            <strong>Selected Plan:</strong> ${escapeHtml(selectedPlan)}
-        </div>
-        <div style="margin-top:12px;font-size:14px;line-height:1.6;">
-            <strong>Message:</strong>
-            <div>${msgHtml}</div>
-        </div>`;
-    const clientContentHtml = `
-        <p style="margin:0 0 12px 0;font-size:14px;color:#374151;">Thanks for reaching out — we’ve received your inquiry.</p>
-        <div style="font-size:14px;line-height:1.6;">
-            <strong>Your message:</strong>
-            <div>${msgHtml}</div>
-        </div>`;
-
     // Prefer EmailJS if configured
     const ds = form.dataset || {};
     const canUseEmailJS = !!(ds.emailjsPublicKey && ds.emailjsServiceId && ds.emailjsTemplateId);
@@ -505,8 +485,8 @@ function handleFormSubmit(form) {
                 site_url: 'https://wafisyed.dev',
                     logo_url: logoUrl,
                     logo_url_png: logoUrlPng,
-                // Content block (use {{{message_html}}} in the EmailJS template)
-                message_html: adminContentHtml
+                // Routing flag for template sections
+                is_client: false
             }
         };
 
@@ -557,8 +537,8 @@ function handleFormSubmit(form) {
                         site_url: 'https://wafisyed.dev',
                         logo_url: logoUrl,
                         logo_url_png: logoUrlPng,
-                        // Content block for client email (use {{{message_html}}})
-                        message_html: clientContentHtml
+                        // Routing flag for template sections
+                        is_client: true
                     }
                 };
                 fetch('https://api.emailjs.com/api/v1.0/email/send', {
