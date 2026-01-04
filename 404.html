@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting…</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#0b0b18; color:#e5e7eb; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+    .box { text-align:center; padding:2rem; border:1px solid #1f2937; border-radius:12px; background:#111827; box-shadow:0 10px 30px rgba(0,0,0,0.35); }
+    .box h1 { margin-bottom:0.5rem; font-size:1.5rem; }
+    .box p { margin:0.35rem 0; color:#cbd5e1; }
+    .box code { color:#22d3ee; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Redirecting…</h1>
+    <p>Taking you to the right page.</p>
+    <p>If it doesn't work, go to <a href="/index.html">Home</a>.</p>
+  </div>
+  <script>
+    (function() {
+      var path = (location.pathname || '/').replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+      var target = null;
+      var map = {
+        '/': '/index.html',
+        '/home': '/index.html',
+        '/index': '/index.html',
+        '/projects': '/projects.html',
+        '/about': '/about.html',
+        '/hire': '/hire.html'
+      };
+
+      if (map[path]) {
+        target = map[path];
+      } else if (path.indexOf('/project/') === 0) {
+        var slug = path.split('/').pop();
+        target = '/project.html' + (slug ? ('?id=' + encodeURIComponent(slug)) : '');
+      } else if (path === '/project') {
+        target = '/project.html';
+      } else if (path.endsWith('.html')) {
+        target = path; // already a file, let it pass through
+      } else {
+        target = '/index.html';
+      }
+
+      var search = target.indexOf('?') === -1 ? (location.search || '') : '';
+      var url = location.origin + target + search + (location.hash || '');
+      if (url !== location.href) {
+        location.replace(url);
+      }
+    })();
+  </script>
+</body>
+</html>
