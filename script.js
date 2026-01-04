@@ -1634,10 +1634,11 @@ function renderProjectDetailPage() {
         titleEl.textContent = 'Project Not Found';
         subtitleEl.textContent = 'Please return to the projects page.';
         if (imgEl) imgEl.style.display = 'none';
-        descEl.textContent = 'We couldn\'t find this project. It may have been moved or renamed.';
+        descEl.textContent = 'We couldn\'t find this project. Redirecting you to Projects…';
         tagsEl.innerHTML = '';
         liveEl.style.display = 'none';
         timelineEl.innerHTML = '';
+        setTimeout(() => { window.location.replace('/projects.html'); }, 600);
         return;
     }
 
