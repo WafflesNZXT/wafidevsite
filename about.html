@@ -71,6 +71,7 @@
         </div>
     </section>
 
+
     <section class="about" id="about">
         <div class="container">
             <div class="about-content">
@@ -111,7 +112,8 @@
                     </div>
                 </div>
 
-                <div class="tech-stack">
+                <div class="about-sidebar">
+                    <div class="tech-stack">
                     <h3>Tech Stack</h3>
                     <div class="tech-categories">
                         <div class="tech-category">
@@ -140,6 +142,97 @@
                                 <li>Canva (Graphic Design)</li>
                             </ul>
                         </div>
+                    </div>
+                    </div>
+                    <!-- Inline Badge Wall under Tech Stack (right column) -->
+                    <div class="badge-wall compact" id="badge-wall">
+                        <h2>Badge Wall</h2>
+                        <p class="section-subtitle">Verified standards and practices</p>
+                        <ul class="badge-grid badge-grid-top" role="list" aria-label="Verified site badges (top row)">
+                            <li class="badge-item" aria-label="Accessibility WCAG AA compliant">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
+                                        <path d="M7 12l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">Accessibility</span>
+                                    <span class="badge-meta">WCAG AA</span>
+                                </div>
+                            </li>
+                            <li class="badge-item" aria-label="Performance Lighthouse scores 90+">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">Performance</span>
+                                    <span class="badge-meta">Lighthouse 90+</span>
+                                </div>
+                            </li>
+                            <li class="badge-item" aria-label="Security HTTPS and HSTS enabled">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"></rect>
+                                        <path d="M8 10V7a4 4 0 118 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">Security</span>
+                                    <span class="badge-meta">HTTPS + HSTS</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul class="badge-grid badge-grid-bottom" role="list" aria-label="Verified site badges (bottom row)">
+                            <li class="badge-item" aria-label="Privacy No invasive trackers">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5a7 7 0 017 7c0 3.866-7 7-7 7s-7-3.134-7-7a7 7 0 017-7z" stroke="currentColor" stroke-width="2"></path>
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"></circle>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">Privacy</span>
+                                    <span class="badge-meta">No invasive trackers</span>
+                                </div>
+                            </li>
+                            <li class="badge-item" aria-label="SEO Structured data and metadata">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">SEO</span>
+                                    <span class="badge-meta">JSON-LD + OG tags</span>
+                                </div>
+                            </li>
+                            <li class="badge-item" aria-label="PWA Offline-ready basics">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2l8 4v6c0 5-3 8-8 10-5-2-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">PWA</span>
+                                    <span class="badge-meta">Offline-ready basics</span>
+                                </div>
+                            </li>
+                            <li class="badge-item" aria-label="Green Hosting Low-impact footprint">
+                                <div class="badge-icon" aria-hidden="true">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22s6-4 6-10a6 6 0 10-12 0c0 6 6 10 6 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M12 12l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="badge-text">
+                                    <span class="badge-title">Green Hosting</span>
+                                    <span class="badge-meta">Low-impact footprint</span>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

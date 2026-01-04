@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCopyActions(); // This line is now moved to the end of the function
     applyPrettyUrls();
     initializePageTransitions();
+    initializeReadingProgress();
 });
 
 // ============================================
@@ -1222,6 +1223,8 @@ function initializeCarousels() {
     initializeProjectsCarousel();
     // Testimonials carousel on about page
     initializeTestimonialsCarousel();
+    // Client Logos Carousel - 2.2 second interval
+    initializeCarousel('.clients-carousel', '.client-prev', '.client-next', '.client-indicator', 2200);
 }
 
 function initializeCarousel(carouselSelector, prevBtnSelector, nextBtnSelector, indicatorSelector, autoPlayInterval = 5000) {
@@ -1397,6 +1400,58 @@ function initializeProjectsCarousel() {
     if (window.innerWidth <= 768) return;
     
     const cards = Array.from(projectsGrid.querySelectorAll('.project-card'));
+    // ============================================
+    // READING PROGRESS BAR (SITEWIDE)
+    // ============================================
+
+    function initializeReadingProgress() {
+        // Avoid duplicates
+        if (document.querySelector('.reading-progress')) return;
+
+        const container = document.createElement('div');
+        container.className = 'reading-progress';
+        container.setAttribute('role', 'progressbar');
+        container.setAttribute('aria-valuemin', '0');
+        container.setAttribute('aria-valuemax', '100');
+        container.setAttribute('aria-label', 'Page scroll progress');
+
+        const bar = document.createElement('div');
+        bar.className = 'reading-progress__bar';
+        container.appendChild(bar);
+        document.body.appendChild(container);
+
+        function getScrollProgress() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+            const docHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            const viewport = window.innerHeight;
+            const total = Math.max(1, docHeight - viewport);
+            return Math.min(100, Math.max(0, (scrollTop / total) * 100));
+        }
+
+        function update() {
+            const pct = getScrollProgress();
+            bar.style.width = pct + '%';
+            container.setAttribute('aria-valuenow', String(Math.round(pct)));
+            // Hide when content doesn't overflow or on top
+            const docHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            const viewport = window.innerHeight;
+            const shouldHide = docHeight <= viewport + 5 || pct < 0.5;
+            container.style.opacity = shouldHide ? '0' : '1';
+        }
+
+        let rafId = null;
+        function onScrollOrResize() {
+            if (rafId) return;
+            rafId = requestAnimationFrame(() => {
+                update();
+                rafId = null;
+            });
+        }
+
+        window.addEventListener('scroll', onScrollOrResize, { passive: true });
+        window.addEventListener('resize', onScrollOrResize);
+        update();
+    }
     
     if (cards.length !== 8) return;
     
@@ -1815,7 +1870,8 @@ function applyTheme(theme) {
 function updateThemeIcon(btn, theme) {
     const icon = btn.querySelector('.theme-icon');
     if (!icon) return;
-    icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+    // Show moon when in light mode; sun when in dark mode
+    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 
 function safeGet(key) {
