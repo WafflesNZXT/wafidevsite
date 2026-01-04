@@ -427,6 +427,28 @@ function handleFormSubmit(form) {
     const selectedPlan = (form.querySelector('#selectedPlan')?.value || '').trim();
     const subjectFinal = selectedPlan ? `[Plan: ${selectedPlan}] ${subject || 'Inquiry'}` : (subject || 'Inquiry');
     const toEmail = (form.dataset.emailjsToEmail || '').trim();
+    const logoUrl = (form.dataset.emailjsLogoUrl || 'https://wafisyed.dev/images/favicon-dark.svg').trim();
+    const logoUrlPng = (form.dataset.emailjsLogoUrlPng || '').trim();
+
+    // Build HTML content blocks for emails (render with triple braces in template)
+    const escapeHtml = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const msgHtml = escapeHtml(message).replace(/\n/g, '<br>');
+    const adminContentHtml = `
+        <div style="font-size:14px;line-height:1.6;">
+            <strong>Client Name:</strong> ${escapeHtml(name)}<br>
+            <strong>Client Email:</strong> ${escapeHtml(email)}<br>
+            <strong>Selected Plan:</strong> ${escapeHtml(selectedPlan)}
+        </div>
+        <div style="margin-top:12px;font-size:14px;line-height:1.6;">
+            <strong>Message:</strong>
+            <div>${msgHtml}</div>
+        </div>`;
+    const clientContentHtml = `
+        <p style="margin:0 0 12px 0;font-size:14px;color:#374151;">Thanks for reaching out — we’ve received your inquiry.</p>
+        <div style="font-size:14px;line-height:1.6;">
+            <strong>Your message:</strong>
+            <div>${msgHtml}</div>
+        </div>`;
 
     // Prefer EmailJS if configured
     const ds = form.dataset || {};
@@ -472,14 +494,19 @@ function handleFormSubmit(form) {
                 email: email,
                 plan: selectedPlan,
                 form_message: message,
-                to_name: 'Wafi Syed',
+                    to_name: 'Wafi Syed', // Explicit client fields for template rendering
+                    client_name: name,
+                    client_email: email,
                 // Branding and site variables
                 brand_name: 'Wafi Syed Portfolio',
                 brand_primary: '#0EA5E9',
                 brand_text: '#111827',
                 brand_border: '#E5E7EB',
                 site_url: 'https://wafisyed.dev',
-                logo_url: 'https://wafisyed.dev/images/favicon.svg'
+                    logo_url: logoUrl,
+                    logo_url_png: logoUrlPng,
+                // Content block (use {{{message_html}}} in the EmailJS template)
+                message_html: adminContentHtml
             }
         };
 
@@ -512,6 +539,9 @@ function handleFormSubmit(form) {
                         client_email: email,
                         selected_plan: selectedPlan,
                         message: message,
+                        // For client confirmation, set a separate display field
+                        display_client_email: email,
+                        reply_to_display: email,
                         reply_to: toEmail, // ensure replies come to your inbox
                         // Ensure templates using common aliases render correctly
                         from_name: name,
@@ -525,7 +555,10 @@ function handleFormSubmit(form) {
                         brand_text: '#111827',
                         brand_border: '#E5E7EB',
                         site_url: 'https://wafisyed.dev',
-                        logo_url: 'https://wafisyed.dev/images/favicon.svg'
+                        logo_url: logoUrl,
+                        logo_url_png: logoUrlPng,
+                        // Content block for client email (use {{{message_html}}})
+                        message_html: clientContentHtml
                     }
                 };
                 fetch('https://api.emailjs.com/api/v1.0/email/send', {
