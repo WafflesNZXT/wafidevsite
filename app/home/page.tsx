@@ -1,5 +1,2 @@
-import { LegacyPage } from "@/lib/legacy-page";
-
-export default function HomeRoute() {
-  return <LegacyPage fileName="index.html" />;
-}
+import { HomePage } from "@/components/home-page";
+export default function HomeRoute() { return <HomePage />; }
