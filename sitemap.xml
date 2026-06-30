@@ -41,6 +41,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://wafisyed.dev/insights</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://wafisyed.dev/insights/small-business-website-cost</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://wafisyed.dev/insights/prepare-before-hiring-developer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://wafisyed.dev/insights/redesign-or-rebuild</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://wafisyed.dev/insights/what-makes-websites-convert</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://wafisyed.dev/lab</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://wafisyed.dev/project</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

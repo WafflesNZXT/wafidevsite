@@ -11,6 +11,7 @@ const navItems = [
   { href: "/home", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/case-studies", label: "Case Studies" },
+  { href: "/insights", label: "Insights" },
   { href: "/about", label: "About" },
   { href: "/hire", label: "Hire Me" },
 ] as const;
@@ -60,6 +61,8 @@ export function SiteHeader() {
                 ? pathname.startsWith("/project")
                 : item.href === "/case-studies"
                   ? pathname.startsWith("/case-studies")
+                  : item.href === "/insights"
+                    ? pathname.startsWith("/insights")
                   : pathname === item.href || (item.href === "/home" && pathname === "/");
               return (
                 <li className="nav-item" key={item.href}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Check, Copy, Download, Layers3, Minus, Plus, RotateCcw, Sparkles, WalletCards } from "lucide-react";
+import { CalendarDays, Check, Copy, Download, Layers3, Link2, Minus, Plus, RotateCcw, Sparkles, WalletCards } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export type PlanName = "Basic" | "Advanced" | "Pro";
@@ -101,6 +101,34 @@ export function BuildEstimator({ onRecommendedPlan, onEstimateChange }: BuildEst
   const [maintenance, setMaintenance] = useState(false);
   const [maintenanceLevel, setMaintenanceLevel] = useState<MaintenanceLevel>("standard");
   const [estimateCopied, setEstimateCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [restored, setRestored] = useState(false);
+
+  useEffect(() => {
+    const encoded = new URL(window.location.href).searchParams.get("estimate");
+    if (!encoded) return;
+    try {
+      const padded = encoded.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+      const saved = JSON.parse(window.atob(padded)) as Record<string, unknown>;
+      const validComplexity = complexityOptions.some((option) => option.value === saved.complexity);
+      const validDesign = designOptions.some((option) => option.value === saved.design);
+      const validSpeed = speedOptions.some((option) => option.value === saved.speed);
+      const validFeatures = Array.isArray(saved.features) ? saved.features.filter((feature): feature is Feature => typeof feature === "string" && feature in featureCosts) : [];
+      const validMaintenance = maintenanceOptions.some((option) => option.value === saved.maintenanceLevel);
+      setPages(Math.min(40, Math.max(1, Number(saved.pages) || 5)));
+      if (Number(saved.pages) > 20) setCustomPageInput(String(Math.min(40, Number(saved.pages))));
+      if (validComplexity) setComplexity(saved.complexity as Complexity);
+      if (validDesign) setDesign(saved.design as Design);
+      if (validSpeed) setSpeed(saved.speed as Speed);
+      setFeatures(validFeatures);
+      setRevisions(Math.min(6, Math.max(1, Number(saved.revisions) || 2)));
+      setMaintenance(Boolean(saved.maintenance));
+      if (validMaintenance) setMaintenanceLevel(saved.maintenanceLevel as MaintenanceLevel);
+      setRestored(true);
+    } catch {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   const estimate = useMemo(() => {
     const base = basePricing[complexity];
@@ -152,6 +180,11 @@ export function BuildEstimator({ onRecommendedPlan, onEstimateChange }: BuildEst
     const timer = window.setTimeout(() => setEstimateCopied(false), 1800);
     return () => window.clearTimeout(timer);
   }, [estimateCopied]);
+  useEffect(() => {
+    if (!linkCopied) return;
+    const timer = window.setTimeout(() => setLinkCopied(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [linkCopied]);
 
   function toggleFeature(feature: Feature) {
     setFeatures((current) => current.includes(feature) ? current.filter((item) => item !== feature) : [...current, feature]);
@@ -185,6 +218,17 @@ export function BuildEstimator({ onRecommendedPlan, onEstimateChange }: BuildEst
     link.download = "wafi-syed-website-estimate.txt";
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function copyEstimateLink() {
+    const saved = { pages, complexity, features, design, speed, revisions, maintenance, maintenanceLevel };
+    const encoded = window.btoa(JSON.stringify(saved)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    const url = new URL(window.location.href);
+    url.searchParams.set("estimate", encoded);
+    url.hash = "";
+    window.history.replaceState({}, "", url);
+    await navigator.clipboard.writeText(url.href);
+    setLinkCopied(true);
   }
 
   return (
@@ -298,10 +342,15 @@ export function BuildEstimator({ onRecommendedPlan, onEstimateChange }: BuildEst
                 <li><Check aria-hidden="true" /><span>{design} design, {speed} delivery, {revisions} revision {revisions === 1 ? "round" : "rounds"}</span></li>
               </ul>
             </div>
-            <div className="estimate-share-actions">
-              <button type="button" onClick={copyEstimate}>{estimateCopied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />} {estimateCopied ? "Copied" : "Copy Summary"}</button>
-              <button type="button" onClick={downloadEstimate}><Download aria-hidden="true" /> Download</button>
+            <div className="estimate-share-block">
+              <span className="estimate-actions-label">Keep or share this estimate</span>
+              <div className="estimate-share-actions">
+                <button type="button" className="save-estimate-action" onClick={copyEstimateLink}>{linkCopied ? <Check aria-hidden="true" /> : <Link2 aria-hidden="true" />} {linkCopied ? "Link Copied" : "Save Estimate Link"}</button>
+                <button type="button" onClick={copyEstimate}>{estimateCopied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />} {estimateCopied ? "Copied" : "Copy Summary"}</button>
+                <button type="button" onClick={downloadEstimate}><Download aria-hidden="true" /> Download File</button>
+              </div>
             </div>
+            {restored && <p className="estimate-restored"><Check aria-hidden="true" /> Saved estimate restored</p>}
             <p className="estimator-note">A planning estimate, not a final quote. We&apos;ll confirm the exact scope together.</p>
           </aside>
         </div>

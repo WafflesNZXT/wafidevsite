@@ -29,7 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" />
-        <link rel="stylesheet" href="/styles.css?v=20260630-case-detail-spacing" />
+        <link rel="stylesheet" href="/styles.css?v=20260630-estimator-actions" />
       </head>
       <body className="tsx-site">
         <div className="abstract-bg" aria-hidden="true" />

@@ -35,8 +35,11 @@ export function SiteFooter() {
             <Link href="/home">Home</Link>
             <Link href="/projects">Projects</Link>
             <Link href="/case-studies">Case Studies</Link>
+            <Link href="/insights">Insights</Link>
+            <Link href="/lab">UI Lab</Link>
             <Link href="/about">About</Link>
             <Link href="/hire">Hire Me</Link>
+            <a href="https://www.useaudo.com/" target="_blank" rel="noreferrer">Audo</a>
           </nav>
           <div className="footer-actions">
             <button className="icon-btn" type="button" onClick={copySiteUrl} aria-label="Copy site URL">

@@ -4,15 +4,17 @@ import { Check, Clock3, Copy, Globe2, Phone, Send, Share2 } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { useEffect, useState, type FormEvent } from "react";
 import type { EstimateSummary, PlanName } from "@/components/build-estimator";
+import type { ProjectBriefSummary } from "@/components/project-brief-wizard";
 
 interface ContactFormProps {
   selectedPlan: PlanName | null;
   estimate: EstimateSummary | null;
+  brief: ProjectBriefSummary | null;
 }
 
 type SubmitState = "idle" | "sending" | "success" | "error";
 
-export function ContactForm({ selectedPlan, estimate }: ContactFormProps) {
+export function ContactForm({ selectedPlan, estimate, brief }: ContactFormProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
   const [phoneCopied, setPhoneCopied] = useState(false);
@@ -20,12 +22,23 @@ export function ContactForm({ selectedPlan, estimate }: ContactFormProps) {
   const [projectMessage, setProjectMessage] = useState("");
 
   useEffect(() => {
-    if (!selectedPlan) return;
-    setSubject(`${selectedPlan} website project inquiry`);
+    if (!selectedPlan && !brief) return;
+    setSubject(`${selectedPlan ? `${selectedPlan} website` : brief?.projectType ?? "Website"} project inquiry`);
     setProjectMessage([
       `Hi Wafi,`,
       ``,
-      `I have selected the ${selectedPlan} plan and would like to discuss moving forward.`,
+      selectedPlan ? `I have selected the ${selectedPlan} plan and would like to discuss moving forward.` : `I completed the project brief and would like to discuss moving forward.`,
+      ...(brief ? [
+        ``,
+        `My project brief:`,
+        `- Project type: ${brief.projectType}`,
+        `- Primary goal: ${brief.goal}`,
+        `- Starting budget: ${brief.budget}`,
+        `- Preferred timeline: ${brief.timeline}`,
+        `- Content status: ${brief.contentStatus}`,
+        ...(brief.notes ? [`- Additional context: ${brief.notes}`] : []),
+      ] : []),
+      ...(selectedPlan ? [
       ``,
       `My current build estimate:`,
       `- Estimated project cost: ${estimate ? `$${estimate.cost.toLocaleString()}` : "To be confirmed"}`,
@@ -37,12 +50,13 @@ export function ContactForm({ selectedPlan, estimate }: ContactFormProps) {
       `- Delivery pace: ${estimate?.speed ?? "To be confirmed"}`,
       `- Revision rounds: ${estimate?.revisions ?? "To be confirmed"}`,
       `- Monthly maintenance: ${estimate?.maintenance ? `${estimate.maintenance.level} ($${estimate.maintenance.monthly}/month)` : "Not selected"}`,
+      ] : []),
       ``,
       `Please let me know the next steps and anything else you need from me.`,
       ``,
       `Thanks!`,
     ].join("\n"));
-  }, [estimate, selectedPlan]);
+  }, [brief, estimate, selectedPlan]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

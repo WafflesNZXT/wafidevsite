@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowDown, Code2, Gauge, MonitorSmartphone, Palette, PenTool, Rocket, Search } from "lucide-react";
+import { ArrowDown, ArrowRight, Code2, FlaskConical, Gauge, MonitorSmartphone, Palette, PenTool, Rocket, Search } from "lucide-react";
+import { AudoAuditHandoff } from "@/components/audo-audit-handoff";
 import { ClientsCarousel } from "@/components/clients-carousel";
 import { FaqSection } from "@/components/faq-section";
 import { FeaturedCarousel } from "@/components/featured-carousel";
@@ -55,6 +56,8 @@ export function HomePage() {
         <div className="container"><h2>Trusted by Clients</h2><ClientsCarousel /></div>
       </section>
 
+      <AudoAuditHandoff />
+
       <section className="skills">
         <div className="container">
           <h2>Technologies & Skills</h2>
@@ -91,6 +94,14 @@ export function HomePage() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section className="lab-invite">
+        <div className="container">
+          <FlaskConical aria-hidden="true" />
+          <div><h2>Try the UI Lab</h2><p>Change viewport sizes, compare messaging, and test the small interactions that make an interface feel finished.</p></div>
+          <Link href="/lab">Open UI Lab <ArrowRight aria-hidden="true" /></Link>
         </div>
       </section>
 

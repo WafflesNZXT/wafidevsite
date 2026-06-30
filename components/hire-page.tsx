@@ -6,6 +6,7 @@ import { BuildEstimator, type EstimateSummary, type PlanName } from "@/component
 import { ContactForm } from "@/components/contact-form";
 import { PageHero, SectionCue } from "@/components/page-primitives";
 import { PricingPackages } from "@/components/pricing-packages";
+import { ProjectBriefWizard, type ProjectBriefSummary } from "@/components/project-brief-wizard";
 
 const services = [
   { title: "Custom Websites", description: "Tailored web solutions built around your business goals.", icon: PanelsTopLeft },
@@ -21,6 +22,7 @@ export function HirePage() {
   const [selectedPlan, setSelectedPlan] = useState<PlanName | null>(null);
   const [currentEstimate, setCurrentEstimate] = useState<EstimateSummary | null>(null);
   const [selectedEstimate, setSelectedEstimate] = useState<EstimateSummary | null>(null);
+  const [projectBrief, setProjectBrief] = useState<ProjectBriefSummary | null>(null);
   const handleRecommendedPlan = useCallback((plan: PlanName) => setRecommendedPlan(plan), []);
   const handleEstimateChange = useCallback((summary: EstimateSummary) => setCurrentEstimate(summary), []);
 
@@ -42,10 +44,11 @@ export function HirePage() {
           </div>
         </div>
       </section>
+      <ProjectBriefWizard onComplete={setProjectBrief} />
       <BuildEstimator onRecommendedPlan={handleRecommendedPlan} onEstimateChange={handleEstimateChange} />
       <PricingPackages recommendedPlan={recommendedPlan} selectedPlan={selectedPlan} onSelect={selectPlan} />
       <SectionCue label="contact below" />
-      <ContactForm selectedPlan={selectedPlan} estimate={selectedEstimate} />
+      <ContactForm selectedPlan={selectedPlan} estimate={selectedEstimate} brief={projectBrief} />
     </main>
   );
 }
